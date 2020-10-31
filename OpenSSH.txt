@@ -1,0 +1,2 @@
+$ ssh -i remote-key remote_user@remote_host
+$  ssh-keygen -f remote-key

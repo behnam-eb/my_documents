@@ -1,0 +1,82 @@
+- hosts: all
+  become: yes
+  handlers:
+    - name: restart Apache
+      service: name=httpd state=restarted
+  tasks:
+    - name: Install git client
+      yum: name=git state=present
+    - name: Download and deploy Swift
+      git:
+        repo: https://github.com/abohmeed/swift
+        dest: /var/www/html/CodeIgniter-3.1.5/
+        clone: yes
+    - name: Install the Apache web server
+      yum: name=httpd state=present
+    - name: Ensure that Apache is started and enabled on system boot
+      service: name=httpd state=started enabled=yes
+    - name: Add EPEL repository
+      yum:
+        name: https://mirrors.nic.cz/epel/7/x86_64/e/epel-release-7-10.noarch.rpm
+        state: present
+    - name: Add Webtatic repository
+      yum:
+        name: https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+        state: present
+    - name: Install PHP 7 and some required packages
+      yum: name={{ item }} state=present
+      with_items:
+        - mod_php71w
+        - php71w-cli
+        - php71w-common
+        - php71w-gd
+        - php71w-mbstring
+        - php71w-mcrypt
+        - php71w-mysqlnd
+        - php71w-xml
+        - unzip
+        - vim
+        - mariadb
+    
+    - name: Change the files ownership to be owned by vagrant
+      file:
+        path: /var/www/html
+        owner: vagrant
+        group: vagrant
+        recurse: yes 
+    - name: Change the web home directory to point at /var/www/html/CodeIgniter-3.1.5
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^.*DocumentRoot "/var/www/html".*$'
+        line: DocumentRoot "/var/www/html/CodeIgniter-3.1.5"
+        state: present
+      notify:
+        - restart Apache
+    - name: Ensure that mod_rewrite is enabled in Apache
+      lineinfile:
+        path: /etc/httpd/conf.modules.d/00-base.conf
+        regexp: '^.*rewrite_module.*$'
+        line: 'LoadModule rewrite_module modules/mod_rewrite.so'
+        state: present
+    - name: Copy htaccess to CodeIgniter
+      copy:
+        src: htaccess
+        dest: /var/www/html/CodeIgniter-3.1.5/.htaccess
+        owner: vagrant
+        group: vagrant
+    - name: Allow .htaccess file to be used
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        insertafter: '</Directory>'
+        line: |
+          <Directory "/var/www/html/CodeIgniter-3.1.5">
+            AllowOverride all
+          </Directory>
+      notify:
+        - restart Apache
+    - name: Upload the database.php file 
+      copy:
+        src: database.php
+        dest: /var/www/html/CodeIgniter-3.1.5/application/config/database.php
+        owner: vagrant
+        group: vagrant

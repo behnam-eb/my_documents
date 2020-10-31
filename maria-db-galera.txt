@@ -1,0 +1,55 @@
+https://downloads.mariadb.org/mariadb/repositories/#mirror=tuna&version=10.1&distro=Ubuntu&distro_release=xenial--ubuntu_xenial
+https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mariadb-10-1-on-ubuntu-16-04-servers
+
+###on all three server 
+apt-get install software-properties-common -y ; apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 ; 
+add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://ftp.kaist.ac.kr/mariadb/repo/10.1/ubuntu xenial main'; apt update ; 
+ apt install mariadb-server rsync -y
+ 
+
+---> /etc/mysql/conf.d/galera.cnf
+
+[mysqld]
+binlog_format=ROW
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+bind-address=0.0.0.0
+
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+# Galera Cluster Configuration
+wsrep_cluster_name="test_cluster"
+wsrep_cluster_address="gcomm://first_ip,second_ip,third_ip"
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_node_address="this_node_ip"
+wsrep_node_name="this_node_name"
+
+-----
+on all servers
+systemctl stop mysql
+
+--
+###--> first node 
+galera_new_cluster
+mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
+
+--> other nodes
+systemctl start mysql 
+mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
+
+--> from node 1 to other nodes 
+scp /etc/mysql/debian.cnf 192.168.14.2:/etc/mysql/debian.cnf
+--> per node -->
+systemctl restart mysql 
+
+--> test 
+mysql -u debian-sys-maint -p
+
+--> 
+Testing Replication

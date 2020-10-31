@@ -1,0 +1,38 @@
+----------------------------------------------------------------
+fail2ban :
+Fail2ban operates by monitoring log files
+	vim.tiny /etc/fail2ban/jail.conf
+		ignoreip =-ip- -ip- ... => liste ip haee ke mikhahim kari beheshoon nadashte bashim va filterha rooshoon emal nashan
+		findtime = 600
+		maxretry = 25 => tooye 600 sanie age 25 bar oon etefagh oftad blockesh kon . in be hame 
+							filterha emal mishe mage inke baraye filter , be tore khas tarif shode bashe
+							
+		logpath  = ... => mire az inja mikhoone
+		
+		cat /etc/fail2ban/filter.d/Chmail.conf
+		 /etc/fail2ban/filter.d/ ===> inja hameye filterha gharar darand vaghti cat konim neveshte tooye oon logi ke male ine donbale in regex ha begard 
+		 
+		 
+	bad az update kerdan file bala :
+		systemctl restart fail2ban.service
+		systemctl status fail2ban.service
+		
+	ba dastoore zir liste oonayye ke ban shodan ro mitoonim bebinim :
+		iptable -nL
+		
+----------------------------------------------------------------
+vim.tiny /etc/iptable-rules
+iptables-restore </etc/iptable-rules
+----------------------------------------------------------------
+hazf kardane tek ip ban shode az list:
+iptables --line-numbers -nL
+iptables -D fail2ban-sasl 1 ==> be jaye 1 shomare khat va be jaye fail2ban-sasl esme chaine marboote ra minevisim
+----------------------------------------------------------------
+iptables-save > iptablesnew
+less iptablesnew
+systemctl stop fail2ban.service
+iptables-restore < iptablesnew
+systemctl start fail2ban.service
+systemctl status fail2ban.service
+iptables -nL | less
+----------------------------------------------------------------

@@ -1,0 +1,11 @@
+----------------------------------------------------------------
+less /opt/Chmail/postfix/conf/main.cf
+less /opt/Chmail/conf/postfix_recipient_restrictions.cf
+smtpd_recipient_restrictions
+------------------------------------------------------------------------------
+postconf virtual_alias_expansion_limit
+postconf -e virtual_alias_expansion_limit=25000 ==> on all mta's
+postfix reload
+------------------------------------------------------------------------------
+zmlocalconfig -e postfix_smtpd_client_restrictions="sleep 1, reject_unauth_pipelining"
+------------------------------------------------------------------------------

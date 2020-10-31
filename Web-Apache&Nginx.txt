@@ -1,0 +1,26 @@
+--------------------------------------------------------------------------
+If-Modified-Since: ----  => 304 Not Modified-Since
+403 Forbidden
+401 Authorization Required
+
+--------------------------------------------------------------------------
+$ nginx -v => showing modules
+--------------------------------------------------------------------------
+sudo apt install apache2
+apache2.conf
+httpd.conf
+/etc/apache2/conf-available or /etc/apache2/conf.d 
+conf-enabled: holds symlinks to the files in /etc/apache2/conf-available. 
+envvars: file where Apache2 environment variables are set.
+mods-available: this directory contains configuration files to both load modules and configure them. Not all modules will have specific configuration files, however.
+mods-enabled: holds symlinks to the files in /etc/apache2/mods-available. When a module configuration file is symlinked it will be enabled the next time apache2 is restarted.
+ports.conf: houses the directives that determine which TCP ports Apache2 is listening on.
+sites-available
+sites-enabled:  contains symlinks to the /etc/apache2/sites-available directory.
+magic: instructions for determining MIME type based on the first few bytes of a file.
+
+/etc/apache2/mods-available/mime.conf, which might also include additions and overrides, and is /etc/mime.types by default.
+
+sudo a2ensite mynewsite
+sudo systemctl restart apache2.service
+--------------------------------------------------------------------------

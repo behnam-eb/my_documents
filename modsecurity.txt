@@ -1,0 +1,33 @@
+ModSecurity is a toolkit for real-time web application monitoring, logging, and access control.
+ModSecurity is a hybrid web application firewall engine that relies on the host web server for some of the work. 
+The only supported web server at the moment is Apache 2.x, but it is possible, in principle, to integrate ModSecurity with any other web server that provides sufficient integration APIs.
+
+Apache does for ModSecurity what it does for all other modules—it handles the infrastructure tasks:
+
+Decrypts SSL
+Breaks up the inbound connection stream into HTTP requests
+Partially parses HTTP requests
+Invokes ModSecurity, choosing the correct configuration context (<VirtualHost>, <Location>, etc.)
+De-chunks request bodies as necessary
+There a few additional tasks Apache performs in a reverse proxy scenario:
+
+Forwards requests to backend servers (with or without SSL)
+Partially parses HTTP responses
+De-chunks response bodies as necessary
+
+Everything in ModSecurity revolves around two things: configuration and rules. 
+The configuration tells ModSecurity how to process the data it sees; the rules decide what to do with the processed data.
+Although it is too early to go into how the rules work, I will show you a quick example here just to give you an idea what they look like.
+
+For example:
+
+SecRule ARGS "<script>" log,deny,status:404
+Even without further assistance, you can probably recognize the part in the rule that specifies what we wish to look for in input data (<script>). Similarly, you will easily figure out what will happen if we do find the desired pattern (log,deny,status:404). Things will become more clear if I tell you about the general rule syntax, which is the following:
+
+SecRule VARIABLES OPERATOR ACTIONS
+The three parts have the following meanings:
+
+The VARIABLES part tells ModSecurity where to look. The ARGS variable, used in the example, means all request parameters.
+The OPERATOR part tells ModSecurity how to look. In the example, we have a regular expression pattern, which will be matched against ARGS.
+The ACTIONS part tells ModSecurity what to do on a match. The rule in the example gives three instructions: log problem, deny transaction and use the status 404 for the denial (status:404).
+

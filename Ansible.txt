@@ -1,0 +1,63 @@
+---- Ad Hoc commands -----------------------------------------------------
+$ ansible [client] -a ["bash --version"]
+$ ansible [-u root] -i [hosts] -m [ping] [test1/all]
+$ ansible [webservers] -a "uptime" => -a executes the command
+$ ansible all -a "cat /etc/hosts"
+$ ansible sebservers -m shell-a 'for item in $(ls ~);do file $item;done'
+$ ansible webservers -m yum -a "name=httpd state=latest"
+$ ansible webservers -m service -a "name=httpd state=started"
+$ ansible webservers -a "systemctl status httpd"
+$ ansible webservers -m scripts -a ./create_content.sh
+$ ansible webservers -m copy -a 'src=index.html dest=/var/www/html/index.html'
+--------------------------------------------------------------------------
+$ ansible-playbook [-i hosts] [test.yml] 
+--------------------------------------------------------------------------
+---- Ansible facts -------------------------------------------------------
+They only require python and ssh. They gather system and hardware information.
+$ ansible webservers -m setup  => output is in json format
+---- Modules -------------------------------------------------------------
+----------------------------
+template => Template a file out to a remote server
+----------------------------
+debug => Print statements during execution
+	msg: [string]
+	var: [string]
+	verbosity: [integer]
+----------------------------
+file => Manage files and file properties
+ file:
+    path: /etc/foo.conf
+    owner: foo
+    group: foo
+    mode: '0644'
+----------------------------
+lineinfile => Manage lines in text files
+ lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^Listen '
+    insertafter: '^#Listen '
+    line: Listen 8080
+----------------------------
+firewalld => Manage arbitrary ports/services with firewalld
+- firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    port: 8081/tcp
+    permanent: yes
+    state: disabled
+----------------------------
+apt => Manages apt-packages
+----------------------------
+yum => Manages packages with the yum package manager
+----------------------------
+yum_repository => Add or remove YUM repositories
+----------------------------
+apt_repository => Add and remove APT repositories
+----------------------------
+npm => Manage node.js packages with npm
+----------------------------
+pip => Manages Python library dependencies
+----------------------------

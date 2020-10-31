@@ -1,0 +1,20 @@
+Adding Hard disk:::::
+
+echo "- - -" > /sys/class/scsi_host/host0/scan
+echo "- - -" > /sys/class/scsi_host/host1/scan
+echo "- - -" > /sys/class/scsi_host/host2/scan
+echo "- - -" > /sys/class/scsi_host/host3/scan
+
+scan a specific scsi port:
+	echo 1 > /sys/class/scsi_device/0\:0\:3\:0/device/rescan
+----------------------------------------------------------------	
+fdisk -l
+fdisk ==> creating partition for all added hard disks
+	n -> p -> 1 -> w
+mkfs.ext4  ==> making filesystem for all new partitions
+mount /dev/sdb1 /mnt
+----------------------------------------------------------------
+sshfs -o sshfs_debug 'administrator@192.168.151.97:D:/backup/' backup/scan a specific scsi port:
+----------------------------------------------------------------
+du --sh /home/
+----------------------------------------------------------------

@@ -1,0 +1,73 @@
+anti spam 
+
+
+1- install dnsmasq
+
+dpkg -i libdbus-1-3_1.2.24-4+squeeze2_amd64.deb
+dpkg -i dnsmasq-base_2.55-2_amd64.deb
+dpkg -i dnsmasq_2.55-2_all.deb
+
+----
+find dns server ip comment all and add nameserver 127.0.0.1
+vim.tiny /etc/resolv.conf
+nameserver 127.0.0.1
+#nameserver 192.168.60.100
+#nameserver 192.168.60.105
+
+---------------
+insert nameserver address in dnsmasq
+ vim.tiny /etc/dnsmasq.conf
+--> server= (nameserver ip address)
+--> server= (nameserver ip address)
+
+cache-size= 4096
+-----
+/etc/init.d/dnsmasq restart
+
+++++++++++++++++++++++++++++++++++
+postfix tune : 
+
+----
+download https://raw.githubusercontent.com/stevejenkins/hardwarefreak.com-fqrdns.pcre/master/fqrdns.pcre
+
+cp /root/fqrdns.pcre /opt/Chmail/postfix/conf/
+chmod +r /opt/Chmail/postfix/conf/fqrdns.pcre
+chown root.postfix /opt/Chmail/postfix/conf/fqrdns.pcre
+
+vim.tiny /opt/Chmail/conf/postfix_recipient_restrictions.cf
+aftre check_sender_access add 
+check_reverse_client_hostname_access pcre:/opt/Chmail/postfix/conf/fqrdns.pcre
+
+
++++++++++++++++++++++++++++++++++++++++++++
+SpamAssassin
+ vim.tiny /opt/Chmail/conf/amavisd.conf.in
+
+$log_level = 2;
+
+----
+add end of fstab
+ vim.tiny /etc/fstab
+tmpfs        /opt/Chmail/data/amavisd/tmp              tmpfs   defaults,noexec,nodev,nosuid,size=1024m,mode=750,uid=Chmail,gid=Chmail 0 0
+--------
+update spam rul 
+https://svn.apache.org/repos/asf/spamassassin/tags/
+lateset sa-update ruls
+example : https://svn.apache.org/repos/asf/spamassassin/tags/sa-update_3.4.2_20161001085037/rules/
+
+
+sa-update_3.4.2_20160901085040.tgz
+
+download https://www.pccc.com/downloads/SpamAssassin/contrib/KAM.cf to sakam.cf
+cp /root/sakam.cf /opt/Chmail/conf/spamassassin/sakam.cf
+
+-----
+at the end of  salocal file
+
+vim.tiny /opt/Chmail/conf/salocal.cf.in
+
+score SPF_FAIL 10.000
+score SPF_HELO_FAIL 10.000
+
+    
+    

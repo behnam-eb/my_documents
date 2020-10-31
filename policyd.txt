@@ -1,0 +1,174 @@
+﻿PolicyD																				نحوه نصب و تنظیمات PolicyD
+=====================================================
+Created Sunday 24 November 2013
+
+
+##### ======================================================================================= new version
+
+## directory cluebringer-v2.1.x-201310261831 ra az server share be masir /opt/Chmail/script copy namaiid ya az masir zir download namaid
+1. cd /opt/Chmail/script/
+2. wget http://5.160.11.253:/archive/cluebringer-v2.1.x-201310261831.tar.gz
+3. apt-get install libnet-server-perl libnet-cidr-perl libconfig-inifiles-perl libcache-fastmmap-perl libmail-spf-perl libdbi-perl libdbd-mysql-perl
+4. tar -zxvf /opt/Chmail/script/cluebringer-v2.1.x-201310261831.tar.gz
+#5. cd /opt/Chmail/script/cluebringer-v2.1.x-201310261831/database
+#	a. $ for i in  core.tsql access_control.tsql quotas.tsql amavis.tsql checkhelo.tsql checkspf.tsql greylisting.tsql accounting.tsql
+#	    $ do
+#	    $ ./convert-tsql mysql $i
+#	    $ done > policyd.mysql
+
+6. ##su - Chmail
+	a. mysqladmin create policyd
+	b. mysql
+		GRANT ALL PRIVILEGES ON `policyd`.* TO `postfix`@`localhost` IDENTIFIED BY 'passworddsfdsf';
+		FLUSH PRIVILEGES;
+		quit
+	c. mysql policyd < /opt/Chmail/script/cluebringer-v2.1.x-201310261831/policyd.sql
+
+7. cd  /opt/Chmail/script/cluebringer-v2.1.x-201310261831/
+    mkdir /etc/cbpolicyd
+
+## Put cluebringer.conf in /etc/cbpolicyd and adjust it with Chmail mysql configurations:
+cp cluebringer.conf   /etc/cbpolicyd
+vim /etc/cbpolicyd/cluebringer.conf
+## edit this line in cluebringer.conf در قسمت تگ دیتابیس اضافه شود
+	DSN=DBI:mysql:database=policyd;host=localhost;port=7306;mysql_socket=/opt/Chmail/db/mysql.sock
+	Username=postfix
+	Password=p0stf1x
+
+8. Copy the cbp/ and awitp/ directory into /usr/local/lib/cbpolicyd-2.1/
+    mkdir /usr/local/lib/cbpolicyd-2.1
+    cp -r cbp /usr/local/lib/cbpolicyd-2.1/
+    cp -r awitpt/awitpt /usr/local/lib/cbpolicyd-2.1/
+	
+9. Copy cbpolicyd and cbpadmin into /usr/local/bin
+    cp cbpadmin /usr/local/bin/
+    cp cbpolicyd /usr/local/sbin/
+	
+
+##### ====================
+## install apache2
+10. apt-get install apache2
+## change port 80 to 20000
+#vim /etc/apache2/sites-available/default
+#vim /etc/apache2/ports.conf
+vim /etc/apache2/sites-available/policyd
+<VirtualHost *:20000>
+        CustomLog  /var/log/apache2/access.log  combined
+        DocumentRoot /var/www/webui/
+#Alias /webui/ /var/www/webui
+        SSLEngine On
+        SSLProtocol All -SSLv2 -SSLv3
+		SSLCertificateFile /opt/Chmail/ssl/Chmail/server/server.crt
+		SSLCertificateKeyFile /opt/Chmail/ssl/Chmail/server/server.key
+		SSLCertificateChainFile /opt/Chmail/ssl/Chmail/ca/ca.pem
+        <Directory />
+                Options FollowSymLinks
+                AllowOverride All
+        </Directory>
+        <Directory /var/www/webui>
+                Options -Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+### change port config 
+vim /etc/apache2/ports.conf
+NameVirtualHost *:20000
+Listen 20000
+### disable 443
+
+###### 
+## default apache directory  /var/www
+cp -r -p webui   /var/www/
+apt-get install php5-mysql php5-suhosin php5-common php5-cli libapache2-mod-php5
+a2enmod ssl
+ln -s /etc/apache2/sites-available/policyd  /etc/apache2/sites-enabled/000-policyd
+/etc/init.d/apache2 restart
+
+11. Install the webui/*  into your apache directory, check out   includes/config.php  and adjust the MySQL server details.
+vim /var/www/webui/includes/config.php
+##edit this line در قسمت همین تگ اضافه شود
+$DB_DSN="mysql:host=localhost;dbname=policyd;unix_socket=/opt/Chmail/db/mysql.sock";
+$DB_USER="postfix";
+$DB_PASS="p0stf1x";
+$DB_TABLE_PREFIX="";
+
+
+اگر این خط اضافه نشود، policyD اعمال نمی شود. این کار نیاز به Down Time دارد.
+12. Edit /opt/Chmail/conf/postfix_recipient_restrictions.cf and add the following as first line:
+	check_policy_service inet:127.0.0.1:10031
+در صورتیکه سرور دارای دسترابیشن لیستی باشد که از طرف ما برایشان ایجاد شده باشد یعنی در فایل بالا خط زیر وجود داشته باشد
+check_recipient_access hash:/opt/Chmail/postfix/conf/protected_recipients
+
+برای اعمال شدن پالیسید نیاز می باشد که فایل 
+/opt/Chmail/postfix/conf/main.cf
+نیز تغییر یابد
+ متغییر 
+smtpd_recipient_restrictions
+را به صورت زیر تغییر دهید
+smtpd_recipient_restrictions = check_policy_service inet:127.0.0.1:10031, check_recipient_access hash ,....
+
+
+
+
+
+13. groupadd cbpolicyd
+useradd cbpolicyd -g cbpolicyd -s /bin/false -M
+
+mkdir /var/log/cbpolicyd/
+mkdir /var/run/cbpolicyd/
+chown -R cbpolicyd: /var/log/cbpolicyd/
+chown -R cbpolicyd: /var/run/cbpolicyd/
+###
+vim /etc/logrotate.d/cbpolicyd
+/var/log/cbpolicyd/cbpolicyd.log
+ {
+copytruncate
+daily
+rotate 90
+compress
+missingok
+}
+
+/usr/sbin/logrotate -f /etc/logrotate.d/
+###
+
+14. cp policyd /etc/init.d/
+      update-rc.d -f policyd defaults
+       ls -l /etc/rc2.d/
+
+	   
+	   
+	   
+#15. mkdir /var/run/mysqld
+
+####chown -h Chmail: /var/run/mysqld/mysqld.sock
+
+16. su - Chmail -c 'zmmtactl stop; zmmtactl start'
+
+## Start PolicyD
+17. cbpolicyd
+
+## Check PolicyD is Running:
+netstat -ntlp | grep :10031
+اگر listen باشد، یعنی PolicyD استارت شده است.
+vim /usr/local/sbin/cbpolicyd
+        $server->{'min_servers'} = 8;
+        $server->{'min_spare_servers'} = 8;
+        $server->{'max_spare_servers'} = 16;
+        $server->{'max_servers'} = 64;
+##service policyd retsart
+/etc/init.d/policyd stop
+/etc/init.d/policyd start
+
+########## Setting Password For Policyd User Interface
+18. vim /var/www/webui/.htaccess
+AuthUserFile /var/www/webui/.htpasswd
+AuthName "admin"
+AuthType Basic
+require valid-user
+
+##save & exit
+## Enter Random Password For Admin
+19. htpasswd -c /var/www/webui/.htpasswd admin

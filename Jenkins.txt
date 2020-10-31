@@ -1,0 +1,43 @@
+---- Installation --------------------------------------------------------
+$ docker pull jenkins/jenkins
+--------------------------------------------------------------------------
+docker-compose.yaml:
+
+version: '3'
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - $PWD/jenkins_home:/var/jenkins_home
+    networks:
+      - net
+networks:
+  net:
+  
+--------------------------------------------------------------------------
+$ useradd jenkins
+$ docker-compose up -d => in the folder that contains YAML file
+$ docker-compose ps
+
+Go to web => password = $ less jenkins_home/secrets/initialAdminPassword
+--------------------------------------------------------------------------
+git config --system http.sslVerify false
+
+git config --global http.sslVerify false
+--------------------------------------------------------------------------
+A job (task) is something that is going to done.
+
+$ docker exec -ti jenkins bash => It opens a shell inside the container and we can exacute commands in it
+$ docker exec -u root -ti jenkins bash
+
+$ docker cp script.sh jenkins:/tmp/script.sh => copy a file from outside of container to it 
+-----
+$ docker-compose build => If you wanna create your own image 
+ in the YAML file 
+ image: remote-host
+ build:
+	context: centos  => the folder which contains the Docker file
+-----

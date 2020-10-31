@@ -1,0 +1,19 @@
+NTP (Network Time Protocol)
+----------------------------------------------------------------
+Time server :
+	vi /etc/ntp.conf
+		server -ip-	
+	for checking :
+		ntpq -pn
+If the Stratum is 16, it normally indicates that your linux server could not reach any of the time peers defined in your ntp.conf file and thus is not synchronized.
+If you see a star (*) against the name of a time server, your time is being synchronised properly.
+
+----------------------------------------------------------------
+in crntab:
+	ntpdate (-ud) server
+		-u => for using unprivilage port number 
+		-d => for debuging
+----------------------------------------------------------------		
+
+
+	

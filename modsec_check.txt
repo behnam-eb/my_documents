@@ -1,0 +1,14 @@
+modsec check:
+1-check hostname of user
+2-audit.log or mailbox.log for find user IP and time
+3- check modsec_audit.log for user ip and time
+4- check standard(html) or advanced(ajax) clientpreftype in log
+5- check Warning section of user log in modsec_audit.log 
+6-viewmail user for checking status of warning modsec (set or unset)
+7- check current clientpreftype 
+8-copy data section of modsecaudit.log to url:
+http://meyerweb.com/eric/tools/dencoder/
+then decode
+9-simulate inputed data at test user in (clientpreftype previously founded at log)
+10-simulate inputed data at test user in current clientpreftype
+11- if OK then reply to customer

@@ -1,0 +1,59 @@
+---- Gitlab installation --------------------------------------------------
+$ yum install -y curl policycoreutils-python
+$ firewall-cmd --permanent --add-service=http
+$ firewall-cmd --permanent --add-service=https
+$ systemctl reload firewalld
+$ yum install postfix
+$ systemctl start postfix
+$ systemctl enable postfix
+$ curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+$ sudo EXTERNAL_URL="https://gitlab.example.com" yum install -y gitlab-ee
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+Local -\working directory -> staging area -> repository(.git folder) => Remote
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+$ git config -- global user.name "...."
+$ git config --global user.email "...."
+$ git config --global --list
+$ git config --global core.editor "notepad++.exe -multiInst -nosession"
+--------------------------------------------------------------------------
+$ cd [working directory]
+$ git init
+$ ls -al .git => this folder contains files that uses by git to manage your files
+$ git add -new file name- => add an untracked file to tracking files by git (staging area)
+$ git add . => add all files to the staging area
+--------------------------------------------------------------------------
+$ vim .gitignore => inside the working directory => file names or patterns of them that you won't git trach them by default
+--------------------------------------------------------------------------
+$ git remote add origin [url] => Connect to a remote repository
+$ git remote add new_repo_name new_repo_url
+$ git remote -v => List all currently configured remote repositories
+$ git clone -url- => for downloading repository to the local system 
+$ git -c http.sslVerify=false clone -url- => for a self signed url
+$ git log => show the history of commits
+$ git show -commit id- => show details of that commit
+$ git init -new project name-  => creating new folder in the working directory for new project
+$ git status => show the status of current branch ( showing the status of branch in cimparison with remote branch and showing uncommited changes )
+$ git diff => show what changes occured
+--------------------------------------------------------------------------
+You can do whatever changes you want and after that commit them as a single unit.
+--------------------------------------------------------------------------
+$ git commit -m "-Your message-"  => commit files in staging area to the local repository
+$ git push origin master => pushing to remote repo (-origin-) and remote branch  (-master-)
+$ git push --set-upstream origin master => after this we can execute just (git push) command
+$ git -c http.sslVerify=false push origin master => for a server with self-signed certificate
+$ git remote rm [remote-name]
+$ git reset => go back to previous commit (maybe because of a fault)
+$ git reset --hard [commit-id]
+$ git checkout [name-of-branch]
+$ git fetch
+$ git merge
+---- If a coflict occures ------------------------------------------------
+$ git pull --rebase origin master => to merge upstream changes to the local repository
+$ git staus => show the conflicts below the "Unmerged paths"
+=> change the files to resolve the conflicts
+$ git add [file-names-that-changed]
+$ git rebase --continue
+$ git push origin master
+--------------------------------------------------------------------------

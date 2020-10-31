@@ -1,0 +1,93 @@
+----------------------------------------------------------------
+/etc/resolve.conf
+----------------------------------------------------------------
+DNS checking :	
+		nslookup
+			server [ip or hostname]
+				set type=[mx/any/...] 
+					[ip or hostname]
+					
+	gmail.com
+	yahoo.com
+	chmail.com
+	tamin.ir(or any domain name)
+				
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+BIND 9 configuration
+----------------------------------------------------------------
+	1.zone :
+		/etc/bind/named.conf.local
+			zone "iran.com" {
+			type master;
+			file "/etc/bind/zones/db.iran.com"; # zone file path
+			#allow-transfer { 10.128.20.12; };         # ns2 private IP address - secondary
+			};
+			
+	2.Records for zone:
+		Ex: /etc/bind/zones/db.iran.com
+			
+			sudo cp ../db.local ./db.behnam.com
+			
+				$TTL    604800
+				@       IN      SOA     localhost. root.localhost.iran.com (
+											  2         ; Serial
+										 604800         ; Refresh
+										  86400         ; Retry
+										2419200         ; Expire
+										 604800 )       ; Negative Cache TTL
+				;
+				@       IN      NS      behnam.test.local	;computer hostname
+				@       IN      MX      10 mail.iran.com      
+				mail      IN      A    222.222.222.222           
+				
+				
+	3.forwarders:
+		/etc/bind/named.conf.options
+			option{
+				forwaders {
+					8.8.8.8;
+				};
+			
+			}
+
+			
+			
+			systemctl reload bind9.service
+----------------------------------------------------------------
+چک کردن dkim
+nslookup
+set type=txt
+chmail._domainkey.ansarbank.ir
+
+mkdir -p /etc/dk/tv5.ir
+cd /etc/dk/tv5.ir
+opendkim-genkey -b 1024 -d tv5.ir -s chmail
+mv chmail.private chmail
+chown opendkim:opendkim *
+chmod u=rw,go-rwx *
+echo "tv5.ir tv5.ir:chmail:/etc/dk/tv5.ir/chmail" >>/etc/dk/KeyTable
+echo "*@tv5.ir tv5.ir" >>/etc/dk/SigningTable
+chown -R opendkim:opendkim /etc/dk/
+chmod go-rwx /etc/dk/*
+/etc/init.d/opendkim stop
+/etc/init.d/opendkim start
+
+
+=========================
+opendkim-testkey -d shahed.ac.ir -k /etc/dk/shahed.ac.ir/chmail -s chmail -vvvvv -x /etc/opendkim.conf
+
+cat /etc/dk/tv5.ir/chmail.txt
+----------------------------------------------------------------
+SPF record :
+syntax ==>   "v=spf1 -all"
+			 "v=spf1 a -all"
+			 "v=spf1 a mx -all"
+			 "v=spf1 +a +mx -all"
+			"+"	Pass
+"-"	Fail
+"~"	SoftFail
+"?"	Neutral
+Fro more information:   http://www.openspf.org/SPF_Record_Syntax
+----------------------------------------------------------------

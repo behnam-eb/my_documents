@@ -1,0 +1,31 @@
+---- Concepts ------------------------------------------------------------
+We must create a directory for each machine and a Vagrantfile inside each directory. 
+In cases such as LAMP, we can create both DB and Web machines inside one directory using one Vagrant file
+--------------------------------------------------------------------------
+---- Installation --------------------------------------------------------
+$ yum update
+$ yum install -y epel-release
+$ yum install -y gcc dkms make qt libgomp patch
+$ yum install -y kernel-headers kernel-devel binutils glibc-headers glibc-devel font-forge
+$ cd /etc/yum.repos.d/
+$ wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+$ yum install -y VirtualBox-5.1
+$ /sbin/rcvboxdrv setup
+$ Virtualbox
+$ wget https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.rpm
+$ yum localinstall vagrant_2.2.10_x86_64.rpm
+$ vagrant -v
+--------------------------------------------------------------------------
+$ mkdir lamp
+$ cd lamp
+$ vagrant init lamp/ubuntu/xenial64
+$ vagrant up
+$ vagrant ssh
+$ vagrant reload
+$ vagrant provision
+$ vagrant suspend
+$ vagrant resume
+$ vagrant halt (--force)
+$ vagrant destroy
+$ vagrant status => the status of machines in the cuurent directory
+--------------------------------------------------------------------------

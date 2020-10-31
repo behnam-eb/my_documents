@@ -1,0 +1,39 @@
+cleanup
+crontab -e 
+V1 --> 35 1 * * * /usr/local/bin/cbpadmin   --cleanup >/dev/null
+
+V2 -->
+ vim.tiny /opt/Chmail/cbpolicyd-2.1/bin/cbpadmin
+change line 25 -->
+use lib('/opt/Chmail/cbpolicyd-2.1/lib/policyd/','/usr/lib/cbpolicyd-2.1','/usr/lib64/cbpolicyd-2.1','awitpt');
+use lib('/opt/Chmail/Chmailmon/lib/','/opt/Chmail/cbpolicyd-2.1/lib/policyd/','/usr/lib/cbpolicyd-2.1','/usr/lib64/cbpolicyd-2.1','awitpt');
+ 
+ crontab -e
+ 35 1 * * * /opt/Chmail/cbpolicyd-2.1/bin/cbpadmin --config=/opt/Chmail/conf/cluebringer.conf --cleanup >/dev/null
+
+----------------------
+
+use policyd
+select * from policy_groups; 
+find internal domains id
+ 
+ select * from policy_group_members where PolicyGroupID='2';
+ check local domain list
+
+INSERT INTO policies (Name,Priority,Description) VALUES('Chmail Policies', 0, 'Chmail Policies');
+ select * from policies;
+ find Chmail Policies ID
+ 
+INSERT INTO policy_members (PolicyID,Source,Destination) VALUES(13, '!%internal_domains', '%internal_domains');
+
+INSERT INTO greylisting (PolicyID,Name,UseGreylisting,GreylistPeriod,Track,GreylistAuthValidity,
+GreylistUnAuthValidity,UseAutoWhitelist,AutoWhitelistPeriod,AutoWhitelistCount,AutoWhitelistPercentage,
+UseAutoBlacklist,AutoBlacklistPeriod,AutoBlacklistCount,AutoBlacklistPercentage)
+ VALUES(13,"Greylisting percentage",1,120,"SenderIP:/32",604800,86400,1,604800,100,95,1,604800,100,100);
+
+
+
+INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (13, 'Sender:user@domain','Sender:user@domain', 60, 'DEFER', 'Deferring: Too many messages from sender in last 60');
+INSERT INTO quotas (PolicyID,Name,Track,Period,Verdict,Data) VALUES (13, 'Recipient:@domain', 'Recipient:@domain', 60, 'DEFER','Deferring: Too many messages to Recipient in last 60');
+INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(1, 'MessageCount', 100);
+INSERT INTO quotas_limits (QuotasID,Type,CounterLimit) VALUES(2, 'MessageCount', 100);

@@ -1,0 +1,111 @@
+---- Installation --------------------------------------------------------
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+	
+$ sudo yum install docker-ce docker-ce-cli containerd.io
+$ sudo systemctl start docker
+$ sudo docker run hello-world
+--------------------------------------------------------------------------
+Uninstalling
+$ sudo yum remove docker-ce docker-ce-cli containerd.io
+$ sudo rm -rf /var/lib/docker
+--------------------------------------------------------------------------
+---- Docker compose ------------------------------------------------------
+Compose is a tool for defining and running multi-container Docker applications.
+With Compose, you use a YAML file to configure your application’s services.
+Then, with a single command, you create and start all the services from your configuration.
+
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+$ docker-compose --version
+$ docker-compose up -d
+$ docker-compose ps
+$ docker-compose logs => logs of containers that are managed by compose
+$ docker-compose logs -f => to follow the logs
+$ docker-compose start/stop/up/down/rm 
+$ docker-compose build => rebuild images that we changed their Dockerfile
+---- Essential commands --------------------------------------------------
+$ docker run --detach --name behnam busybox(name of image) => --detach -> for running in the background 
+$ docker start/stop/restart/kill/rm (name of container)
+$ docker ps (--all)
+$ docker info
+$ docker version
+$ docker top CONTAINER => Show info on docker processes
+$ docker diff CONTAINER => Show container file system changes
+$ docker history [OPTIONS] IMAGE => Show container build history
+$ docker events => get real-time events from the server
+$ docker images   || $ docker image ls
+$ docker rmi IMAGE => delete an image
+$ docker rm CONTAINER => delete a container 
+$ docker inspect -container's name- => view container's information
+$ docker inspect jenkins|grep -i ip
+$ docker inspect --format='{{.State.Pid}}' -container's name- => show the pid of container on the local host
+$ docker info | grep -i root => where docker is saving the files => /var/lib/docker
+$ docker logs -f -container's name-
+$ docker volume ls
+$ docker network ls
+$ docker exec -ti jenkins bash => [bash] is the command that we want to run inside the container 
+$ docker exec -u root -ti jenkins bash
+$ docker exec -it container_1 ifconfig
+$ docker cp script.sh jenkins:/tmp/script.sh
+$ docker cp <containerId>:/file/path/within/container /host/path/target =< from container to the host
+$ docker network create --driver bridge my_bridge_network   => $ docker inspect my_bridge_network <= show the IP range of this network
+$ docker netwok connect bridge container3 => connect container3 in other bridge network to another network ( old bridge network )
+$ docker network disconnect bridge container3
+--------------------------------------------------------------------------
+$ docker run -d -p 5000:5000 --restart=always-v /mnt/registry:/var/lib/registry--name registry registry:2
+$ docker pull ubuntu:16.04
+$ docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+$ docker push localhost:5000/my-ubuntu
+--------------------------------------------------------------------------
+$ docker login --username=behnam   => login to DockerHub
+$ docker push [container]:[tag]
+--------------------------------------------------------------------------
+$ docker commit -m="..." -a="..." [CONTAINER_ID] [new_image_name]
+$ docker save -o xxx.tar [new_image_name]
+$ scp xxx.tar ...:/tmp
+$ docker load -i /tmp/xxx.tar
+$ docker run ...
+---- Build a Docker image ------------------------------------------------
+$ git clone https://github.com/dockersamples/node-bulletin-board
+$ cd node-bulletin-board/bulletin-board-app
+$ docker build --tag bulletinboard:1.0 .
+---- Docker file ---------------------------------------------------------
+FROM jenkins/jenkins => the base image that we use for creating a new image
+//USER root 
+RUN ..... => linux commands
+//USER jenkins => now we execute our commands, so we put the previous user back
+--------------------------------------------------------------------------
+---- Docker compose file -------------------------------------------------
+version: '3'
+services:
+	jenkins:
+		container_name: jenkins
+		image: jenkins/jenkins
+		ports:
+			- "8080:8080"
+		volumes:
+			- "$PWD/jenkins_home:/var/jenkins_home"
+		networks:
+			- net
+	db_host:
+		container_name: db_host
+		image: mysql:5.7
+		environment:
+			- "MYSQL_ROOT_PASSWORD"=1234"
+		volumes:
+			- "$PWD/db_data:/var/lib/mysql"
+		networks:
+			- net
+	remote_host:
+		container_name: remote-host
+		image: image-host
+		build:
+			context: centos7  => the folder that there is a related docker file 
+		volumes:
+			- "$PWD/aws-s3.sh:/tmp/script.sh"
+		networks:
+			- net
+--------------------------------------------------------------------------

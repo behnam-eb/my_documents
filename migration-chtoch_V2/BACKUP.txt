@@ -1,0 +1,76 @@
+IMPORTANT :
+after run scripts , check output files of every script
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+OLD SERVER:
+IPTABLE:
+1-scp /etc/iptrables.rules to newserverIP:
+2-at iptable drop any 80 443 110 143 465 25 993 995 input & output
++++++++++++++++++++++++
+check queue and then sync data again
++++++++++++++++++++++
+STORE & INDEX VOLUME:
+before anything !: in both servers , check zmcontrol status  (all services must run !)
+1- run with Chmail user: zmvolume -l (for check all store and index disks - you should create all store and index mount points at the new server)
+rsync -a -H --delete /opt/Chmail/store/* newserverIP:/opt/Chmail/store (if storevolume=/opt/Chmail/store/)
+rsync -a -H --delete /opt/Chmail/index/* newserverIP:/opt/Chmail/index (if indexvolume=/opt/Chmail/index/)
+cd migration-chtoch_V2
+MYSQL BACKUP:
+2- run dumpall.sh with root user (dump database to all.sql)
+LDAP BACKUP:
+3- run ldapback.sh  with root user(backup ldap base on top level domain: user.ldif)
+4- check spam and ham account : (remember accs)
+su - Chmail -c 'zmprov gacf ChmailSpamIsNotSpamAccount'
+su - Chmail -c 'zmprov gacf ChmailSpamIsSpamAccount'
+5- SCP ALL BACKUP FILES TO NEW SERVER: scp -r migration-chtoch_V2 newserveripIP:
++++++++++++++++++++++++++
++++++++++++++++++++++++++
+
+NEW SERVER:
+STORE & INDEX VOLUME:
+1- create index & store volumes (same oldserver)
+MYSQL BACKUP & RESTORE:
+cd migration-chtoch_V2
+2- backup mysql with newdumpall.sh script (dump database to new.sql)
+3-delete current Chmail & mboxgroup database:
+	NOTE: copy output of below script to clipboard:
+	create script drop.sh (change i to number of current mboxgroup database) then run script with root user:
+	#! /bin/bash
+	for (( i=1; i <= 100; i++ ))
+	do
+	#su - Chmail -c 'mysql -ANe "drop database mboxgroup$i"'
+	echo "drop database mboxgroup$i;"
+	done
+	
+	THEN paste everything you copied when sudo to Chmail mysql:
+	su - Chmail
+	mysql
+	"paste here everthing you copeid, then:"
+	
+	drop database Chmail
+	quit
+	exit
+	
+4- restore mysql database:
+cp all.sql /opt/Chmail/log/
+chown -R Chmail: /opt/Chmail/log/all.sql
+su - Chmail -c 'mysql < /opt/Chmail/log/all.sql'
+	after this step (show databases;) to check databases;
+
+5- run newldapbackup.sh (backup new database ldap):  
+DELETE CURRENT LDAP DATABASE:
+6- run ldapdelete.sh (export list for delete to del.ldif file, chack del.ldif)
+7- run rundelete.sh (delete accs exported to del.ldif)
+RESTORE LDAP DATABASE:
+8- run ldaprestore.sh (cp user.ldif at here to read script from files)
+9- DEFINE SPAM AND HAM ACCOUNTS IN GLOBAL CONFIG (exported previously in oldserver):
+su - Chmail -c 'zmporv -l mcf ChmailSpamIsNotSpamAccount hamaccount'
+su - Chmail -c 'zmporv -l mcf ChmailSpamIsSpamAccount spam
+10- change ip to old server ip, vi /etc/network/interfaces (if temp ip exist change to temp ip ,IMPORTANT:you should have ssh to oldpublicIP and newpublicIP)
+11- change /etc/hosts to old server ip
+12- after change: 
+su - Chmail -c 'ldap restart'
+su - Chmail -c 'zmapachectl restart'
+13- cp /etc/iptrables.rules /etc/iptrables.rules.old
+14- cp /root/iptables.rules  /etc/ dir and accept port 80 443 25 for chaapaar ip for test(46.36.124.20, 5.160.11.200)
+15- cp /etc/iptrables.rules.old /etc/iptrables.rules
+

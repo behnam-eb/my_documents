@@ -1,0 +1,59 @@
+----------------------------------------------------------------
+LDAP SEARCH :
+/opt/Chmail/bin/ldapsearch -x -w PASSWORD -D 'uid=chmail,cn=admins,cn=chmail' -h LDAPHOST -b "" '(ChmailLastLogonTimestamp<=20151001113430Z)' ChmailLastLogonTimestamp
+/opt/Chmail/bin/ldapsearch -x -w BtNURm6c9v -D 'uid=chmail,cn=admins,cn=chmail' -h mail.iranair.com -b "" '(&(!(ChmailCOSId=*))(ChmailLastLogonTimestamp<=20151001113430Z))'|grep -i "ChmailMailDeliveryAddress"|wc -l
+/opt/Chmail/bin/ldapsearch -x -w "Aa123456" -D 'cn=chtest,cn=users,dc=locallan,dc=msrt,dc=ir' -H ldap://10.1.1.2 -b 'dc=locallan,dc=msrt,dc=ir' '(memberOf=CN=MSRTMail_Int,CN=Users,DC=LocalLAN,DC=msrt,DC=ir)' objectSid sAMAccountName givenName displayName pwdLastSet-LLL
+----------------------------------------------------------------
+LDAP Modify and Add :
+/opt/Chmail/openldap/bin/ldapmodify -x -w vomUEdmKU2 -D "uid=Chmail,cn=admins,cn=Chmail" -H  ldap://mail.chtest11.ir -f pass.ldif
+	https://www.digitalocean.com/community/tutorials/how-to-use-ldif-files-to-make-changes-to-an-openldap-system
+----------------------------------------------------------------
+LDAP Delete :
+/opt/Chmail/openldap/bin/ldapdelete -x -w DOg9Ue8Fx8 -D 'uid=chmail,cn=admins,cn=chmail' -H ldap://mail.ito.gov.ir:389
+	> cn=mta.itc.ir,cn=servers,cn=Chmail  <==== oon dn e ke mikhay hazf koni
+----------------------------------------------------------------
+LDAP configs in Chmail :
+less /opt/Chmail/data/ldap/config/cn\=config/cn\=schema/cn\=\{3\}Chmail.ldif
+---------
+ldap replication (in Chmail) :
+	ldap master ===> acount creating , password , ...
+	ldap slave ===> auth
+----------------------------------------------------------------
+openLDAP installation & configuration :
+
+https://www.howtoforge.com/how-to-install-openldap-server-on-debian-and-ubuntu
+https://wiki.debian.org/LDAP/OpenLDAPSetup
+
+	apt-get update
+	apt-get install slapd ldap-utils ldapscripts
+	dpkg-reconfigure -plow slapd
+	
+	ldapsearch -x -w salamsalam -D 'cn=admin,dc=pasargad,dc=ir' -h 127.0.0.1 -b 'dc=pasargad,dc=ir'
+	
+If you added an index for an attribute in slapd.conf you have to re-index your database. Otherwise entries are not found anymore when using
+this newly indexed attribute in the search filter. Create or modify /etc/ldap/slapd.conf to contain the following:
+	index   objectClass             eq
+	index   cn                      pres,sub,eq
+	index   sn                      pres,sub,eq
+	index   uid                     pres,sub,eq
+	index   displayName             pres,sub,eq
+	index   default                 sub
+	index   uidNumber               eq
+	index   gidNumber               eq
+	index   mail,givenName          eq,subinitial
+	index   dc                      eq
+After any new indexes have been defined or other major database changes have been made
+	# service slapd stop
+	# sudo -u openldap slapindex
+	# service slapd start
+	
+	
+	chkconfig --levels 235 ldap on
+	service ldap start
+	
+	vim.tiny /etc/ldap/ldap.conf
+		BASE    dc=example,dc=com
+		URI     ldap://192.168.0.100 ldap://192.168.0.100:666
+	Save the file and run the following command to reconfigure the LDAP package.
+		dpkg-reconfigure slapd ==> select NO ==> DNS domain name ==>
+-----------------------------------------------------------------

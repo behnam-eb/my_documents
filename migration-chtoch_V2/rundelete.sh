@@ -1,0 +1,1 @@
+/opt/Chmail/openldap/bin/ldapdelete  -x -w $(su - Chmail -c 'zmlocalconfig -s ldap_root_password '  | awk '{print $3}') -D "$(su - Chmail -c 'zmlocalconfig -s Chmail_ldap_userdn'  | awk '{print $3}')" -H ldap://"$IP" -f del.ldif

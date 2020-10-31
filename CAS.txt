@@ -1,0 +1,22 @@
+cas=central authentication service
+The Central Authentication Service (CAS) is a single sign-on protocol for the web.[1] Its purpose is to permit a user to access multiple applications while providing their credentials (such as userid and password) only once. 
+It also allows web applications to authenticate users without gaining access to a user's security credentials, such as a password.
+
+
+web server=tomcat
+database=mariadb
+1) mariadb installation (mariadb-server)
+2) creating one database (name= cas)
+3) tarife karbar baraye dastresi be database cas az hoste marboote:
+	GRANT ALL PRIVILEGES ON cas.* TO 'casuser'@'192.168.127.76' IDENTIFIED BY 'salamsalam';
+4)import kardane certe demo.mail.chaapaar.ir be cas
+	az demo in file ro kopy kon /opt/Chmail/ssl/Chmail/ca/ca.pem
+echo $JAVA_HOME
+cd .masire java.
+cd bin/keytool
+nahve estefade az keytool:
+	https://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html
+deafault pass for keytool : changeit
+
+tomcat conf : server.xml
+...../database.xml => ye jayee inja bayad user va pass va ip database ro bedim
