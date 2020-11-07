@@ -1,3 +1,21 @@
+---- Ansible AWX (web based) ---------------------------------------------
+https://github.com/ansible/awx/blob/devel/INSTALL.md
+---- ssh configurations --------------------------------------------------
+~/.ssh/known_hosts
+~/.ssh/authorized_keys
+## inside the ansible server:
+inside config file => host_key_checking = false 
+$ ssh-keygen => $ ssh-copy-id [name-of-dest-server]
+
+$ for host in ubunto1 ubuntu2 ubuntu3 ubuntu4
+  > do
+  > ssh-copy-id ${host}
+  > done
+--------------------------------------------------------------------------
+$ ansible --version => to see location of config file and etc
+$ ansible-doc -l => list all modules
+$ ansible-doc [module-name] => docs for specified module
+$ ansible [all|groupname] --list-hosts => also we can use reges (ex: ~.*3)
 ---- Ad Hoc commands -----------------------------------------------------
 $ ansible [client] -a ["bash --version"]
 $ ansible [-u root] -i [hosts] -m [ping] [test1/all]
@@ -9,12 +27,42 @@ $ ansible webservers -m service -a "name=httpd state=started"
 $ ansible webservers -a "systemctl status httpd"
 $ ansible webservers -m scripts -a ./create_content.sh
 $ ansible webservers -m copy -a 'src=index.html dest=/var/www/html/index.html'
+$ ansible [all] -m [copy] [-a 'remote-src=yes src=/tmp/x dest=/temp/y'] => -a for arguments and -m for modules
+$ ansible all -m command -a 'hostname' -o
 --------------------------------------------------------------------------
 $ ansible-playbook [-i hosts] [test.yml] 
+$ ansible-playbook -i hosts --syntax-check test.yaml => just for syntax checking !
 --------------------------------------------------------------------------
+---- Inventory file (hosts) ----------------------------------------------
+### ex 1
+[web-servers]
+centos1 [ansible_user=root]
+nginx
+...
+[db-servers]
+ubuntu1 [ansible_become=true ansible_become_pass=pass]
+...
+### ex 2
+[centos]
+centos1 ansible_port=2222
+centos[2:3]
+
+[centos:vars]
+ansible_user=root
+
+[ubuntu]
+ubuntu[1:3]
+
+[ubuntu:vars]
+ansible_become=true
+ansible_become_pass=true
+
+[linux:children]
+centos
+ubuntu
 ---- Ansible facts -------------------------------------------------------
 They only require python and ssh. They gather system and hardware information.
-$ ansible webservers -m setup  => output is in json format
+$ ansible [webservers] -m setup  => output is in json format
 ---- Modules -------------------------------------------------------------
 ----------------------------
 template => Template a file out to a remote server

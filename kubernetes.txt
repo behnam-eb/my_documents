@@ -38,7 +38,11 @@ $ yum install -y kubectl
 $ ps -e | grep kube
 $ ps -e | grep etcd
 --------------------------------------------------------------------------
+Dashboard:
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
 --------------------------------------------------------------------------
+$ minikube addons enable metrics-server => it takes about 5 minutes to enable this
+$ watch kubectl top [pod] [--container] => to see cpu and memory using
 --------------------------------------------------------------------------
 $ kubectl api-resources => show all resources in the cluster
 $ kubectl explain [type] => documentation about desired type
@@ -49,15 +53,14 @@ $ kubectl run NAME --image=image [--env="key=value"] [--port=port] [--dry-run=se
 $ kubectl create cronjob [NAME] --image=image --schedule='0/5 * * * ?' -- [COMMAND] [args...]
 $ kubectl create cronjob my-job --image=busybox --schedule="*/1 * * * *"
 $ kubectl [create|apply|update] -f [name].yaml
-$ kubectl [create|delete] [pod|service|configmap] [name] -f [file]
+$ kubectl [create|delete] [pod|service|configmap|namespace] [[name] -f [file]]
 $ kubectl get [all|node|pods|replicaset|deployment|service|endpoints|secrets|namespaces|cronjobs] ((-o yaml/json/wide))
 $ kubectl get pods --all-namespaces(or -A)
+$ kubectl get [pods|...] --selector [app=rng] => to limit the results
 $ kubectl -n kube-public get configmap cluster-info -o yaml => -n = specify the namespace
 $ kubectl describe [node|pod|replicaset|deployment|service|configmap] [name]
 $ kubectl scale replicationcontroller --replicas=4 [name-of-service]
 $ kubectl scale deployment [pingpong] --replicas 3
-$ etcdctl ls /regitry
-$ etcdctl get /registry/ranges/servicenodeports
 $ kubectl exec -it [.......] -- /bin/bash
 $ kubectl exec -it [database] -- mysql -u root -p
 $ kubectl exec -it [pod-name] -c [container-name] -- /bin/bash
@@ -65,5 +68,8 @@ $ kubectl logs (--tail 1) (--follow) [..........]
 $ kubectl logs deployment pingpong
 $ kubectl logs -l run=pingpong --tail 1 -f => -l show all resources with the following label (run=pingpong) , -f=--follow
 $ kubectl expose deployment [my-deployment] --port [8888] => vreating a ClusterIP service
+$ kubectl edit [deployment|...] [name] => to edit an object on the fly => opens the default editor of OS to edit
+$ kubectl cluster-info dump => information about cluster for debuging
 --------------------------------------------------------------------------
-$ minikube start
+$ etcdctl ls /regitry
+$ etcdctl get /registry/ranges/servicenodeports

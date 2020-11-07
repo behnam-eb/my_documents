@@ -13,10 +13,11 @@ $ sudo EXTERNAL_URL="https://gitlab.example.com" yum install -y gitlab-ee
 Local -\working directory -> staging area -> repository(.git folder) => Remote
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
-$ git config -- global user.name "...."
+$ git config --global user.name "...."
 $ git config --global user.email "...."
 $ git config --global --list
 $ git config --global core.editor "notepad++.exe -multiInst -nosession"
+$ git config --global http.sslVerify false =>>>>> solution for my jenkins server <<<<<<
 --------------------------------------------------------------------------
 $ cd [working directory]
 $ git init

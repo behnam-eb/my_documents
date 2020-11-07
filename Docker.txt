@@ -57,10 +57,10 @@ $ docker network disconnect bridge container3
 --------------------------------------------------------------------------
 $ docker run -d -p 5000:5000 --restart=always-v /mnt/registry:/var/lib/registry--name registry registry:2
 $ docker pull ubuntu:16.04
-$ docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+$ docker tag ubuntu:16.04 localhost:5000/my-ubuntu => source to dest
 $ docker push localhost:5000/my-ubuntu
 --------------------------------------------------------------------------
-$ docker login --username=behnam   => login to DockerHub
+$ docker login -u behnam -p qazwsx => login to DockerHub
 $ docker push [container]:[tag]
 --------------------------------------------------------------------------
 $ docker commit -m="..." -a="..." [CONTAINER_ID] [new_image_name]
