@@ -1,0 +1,13 @@
+--------------------------------------------------------------------------
+$ nginx -v => showing modules
+--------------------------------------------------------------------------
+---- Nginx hardening -----------------------------------------------------
+https://www.cyberciti.biz/tips/linux-unix-bsd-nginx-webserver-security.html
+https://www.tecmint.com/nginx-web-server-security-hardening-and-performance-tips/
+--------------------------------------------------------------------------
+---- RTMP configuration(video streaming) ---------------------------------
+https://docs.peer5.com/guides/setting-up-hls-live-streaming-server-using-nginx/
+--------------------------------------------------------------------------
+---- Building CDN --------------------------------------------------------
+https://blog.unixy.net/2010/07/how-to-build-your-own-cdn-using-bind-geoip-nginx-and-varnish/
+--------------------------------------------------------------------------

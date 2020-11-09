@@ -46,8 +46,10 @@ $ watch kubectl top [pod] [--container] => to see cpu and memory using
 --------------------------------------------------------------------------
 $ kubectl api-resources => show all resources in the cluster
 $ kubectl explain [type] => documentation about desired type
-$ kubectl explain node
-$ kubectl explain node.spec
+$ kubectl explain pod
+$ kubectl explain pod.spec
+$ kubectl explain pod.spec.volumes
+$ kubectl api-versions
 -------------------------
 $ kubectl run NAME --image=image [--env="key=value"] [--port=port] [--dry-run=server|client] [--overrides=inline-json] [--command] -- [COMMAND] [args...]
 $ kubectl create cronjob [NAME] --image=image --schedule='0/5 * * * ?' -- [COMMAND] [args...]

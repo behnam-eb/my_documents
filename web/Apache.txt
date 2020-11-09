@@ -1,10 +1,14 @@
 --------------------------------------------------------------------------
 If-Modified-Since: ----  => 304 Not Modified-Since
 403 Forbidden
-401 Authorization Required
-
---------------------------------------------------------------------------
-$ nginx -v => showing modules
+401 Unauthorized
+200 OK
+206 Partial Content
+400 Bad Request
+500 Internal Server Error
+404 Not Found
+301 Moved Permanently
+405 Method Not Allowed
 --------------------------------------------------------------------------
 sudo apt install apache2
 apache2.conf
@@ -21,6 +25,6 @@ magic: instructions for determining MIME type based on the first few bytes of a 
 
 /etc/apache2/mods-available/mime.conf, which might also include additions and overrides, and is /etc/mime.types by default.
 
-sudo a2ensite mynewsite
-sudo systemctl restart apache2.service
+$ sudo a2ensite mynewsite
+$ sudo systemctl restart apache2.service
 --------------------------------------------------------------------------
