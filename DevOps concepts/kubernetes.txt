@@ -72,6 +72,9 @@ $ kubectl logs -l run=pingpong --tail 1 -f => -l show all resources with the fol
 $ kubectl expose deployment [my-deployment] --port [8888] => vreating a ClusterIP service
 $ kubectl edit [deployment|...] [name] => to edit an object on the fly => opens the default editor of OS to edit
 $ kubectl cluster-info dump => information about cluster for debuging
+$ kubectl apply -f [web.yaml] --dry-run --validate=true -o yaml => just for testing => it just executes in the client not server
+$ kubectl apply -f [web.yaml] --server-dry-run --validate=false -o yaml => it execute the yaml file but doesn't save to db so aliminates all false parts
+$ kubectl diff -f [seb.yaml] => difference between the changed file and the created resource
 --------------------------------------------------------------------------
 $ etcdctl ls /regitry
 $ etcdctl get /registry/ranges/servicenodeports
