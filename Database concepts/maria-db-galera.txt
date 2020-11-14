@@ -1,55 +1,79 @@
-https://downloads.mariadb.org/mariadb/repositories/#mirror=tuna&version=10.1&distro=Ubuntu&distro_release=xenial--ubuntu_xenial
-https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mariadb-10-1-on-ubuntu-16-04-servers
+--------------------------------------------------------------------------
+---- All servers ---------------------------------------------------------
+$ sudo vi /etc/yum.repos.d/mariadb.repo
+		[mariadb]
+		name = MariaDB
+		baseurl = http://yum.mariadb.org/10.4/centos7-amd64
+		gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+		gpgcheck=1
+$ sudo yum makecache --disablerepo='*' --enablerepo='mariadb'
+$ sudo yum install MariaDB-server MariaDB-client
+$ sudo systemctl start mariadb
+$ sudo systemctl enable mariadb
+$ sudo mysql -uroot
+		> set password = password("your_password");
+$ sudo yum install rsync policycoreutils-python
+---- First Node ----------------------------------------------------------
+$ sudo vi /etc/my.cnf.d/galera.cnf
+		 [mysqld]
+		binlog_format=ROW
+		default-storage-engine=innodb
+		innodb_autoinc_lock_mode=2
+		bind-address=0.0.0.0
 
-###on all three server 
-apt-get install software-properties-common -y ; apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8 ; 
-add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://ftp.kaist.ac.kr/mariadb/repo/10.1/ubuntu xenial main'; apt update ; 
- apt install mariadb-server rsync -y
- 
+		# Galera Provider Configuration
+		wsrep_on=ON
+		wsrep_provider=/usr/lib64/galera-4/libgalera_smm.so
 
----> /etc/mysql/conf.d/galera.cnf
+		# Galera Cluster Configuration
+		wsrep_cluster_name="test_cluster"
+		wsrep_cluster_address="gcomm://First_Node_IP,Second_Node_IP,Third_Node_IP"
 
-[mysqld]
-binlog_format=ROW
-default-storage-engine=innodb
-innodb_autoinc_lock_mode=2
-bind-address=0.0.0.0
+		# Galera Synchronization Configuration
+		wsrep_sst_method=rsync
 
-# Galera Provider Configuration
-wsrep_on=ON
-wsrep_provider=/usr/lib/galera/libgalera_smm.so
-
-# Galera Cluster Configuration
-wsrep_cluster_name="test_cluster"
-wsrep_cluster_address="gcomm://first_ip,second_ip,third_ip"
-
-# Galera Synchronization Configuration
-wsrep_sst_method=rsync
-
-# Galera Node Configuration
-wsrep_node_address="this_node_ip"
-wsrep_node_name="this_node_name"
-
------
-on all servers
-systemctl stop mysql
-
---
-###--> first node 
-galera_new_cluster
-mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
-
---> other nodes
-systemctl start mysql 
-mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
-
---> from node 1 to other nodes 
-scp /etc/mysql/debian.cnf 192.168.14.2:/etc/mysql/debian.cnf
---> per node -->
-systemctl restart mysql 
-
---> test 
-mysql -u debian-sys-maint -p
-
---> 
-Testing Replication
+		# Galera Node Configuration
+		wsrep_node_address="This_Node_IP"
+		wsrep_node_name="This_Node_Name"
+---- Reminding Nodes -----------------------------------------------------
+$ sudo vi /etc/mysql/my.cnf.d/galera.cnf
+		. . .
+		# Galera Node Configuration
+		wsrep_node_address="This_Node_IP"
+		wsrep_node_name="This_Node_Name"
+		. . .
+###
+$ sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp => For MariaDB client connections and State Snapshot Transfer that use the mysqldump method
+$ sudo firewall-cmd --permanent --zone=public --add-port=4567/tcp => For Galera Cluster replication traffic. Multicast replication uses both UDP transport and TCP on this port.
+$ sudo firewall-cmd --permanent --zone=public --add-port=4567/udp
+$ sudo firewall-cmd --permanent --zone=public --add-port=4568/tcp => For Incremental State Transfers, or IST, the process by which a missing state is received by other nodes in the cluster.
+$ sudo firewall-cmd --permanent --zone=public --add-port=4444/tcp => For all other State Snapshot Transfers, or SST, the mechanism by which a joiner node gets its state and data from a donor node.
+$ sudo firewall-cmd --permanent --zone=public --add-source=galera-node-1-ip/32
+$ sudo firewall-cmd --permanent --zone=public --add-source=galera-node-2-ip/32
+$ sudo firewall-cmd --permanent --zone=public --add-source=galera-node-3-ip/32
+$ sudo firewall-cmd --reload
+###
+$ sudo semanage port -a -t mysqld_port_t -p tcp 4567
+$ sudo semanage port -a -t mysqld_port_t -p udp 4567
+$ sudo semanage port -a -t mysqld_port_t -p tcp 4568
+$ sudo semanage port -a -t mysqld_port_t -p tcp 4444
+$ sudo semanage permissive -a mysqld_t => after some configs we will enable it again!
+---- SELinux -------------------------------------------------------------
+$ sudo systemctl stop mariadb => on all nodes
+$ sudo galera_new_cluster => on first node
+$ mysql -u root -p -e 'CREATE DATABASE selinux; =>> on first node
+	CREATE TABLE selinux.selinux_policy (id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id));
+	INSERT INTO selinux.selinux_policy VALUES ();'
+$ sudo systemctl start mariadb => first the second node and then the other
+$ mysql -u root -p -e 'INSERT INTO selinux.selinux_policy VALUES ();' => on all nodes
+$ sudo grep mysql /var/log/audit/audit.log | sudo audit2allow -M Galera => on all nodes
+$ sudo semodule -i Galera.pp => on all nodes
+$ sudo semanage permissive -d mysqld_t => on all nodes
+--------------------------------------------------------------------------
+$ sudo systemctl stop mariadb => on all nodes
+$ sudo galera_new_cluster => on first node
+$ mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
+$ sudo systemctl start mariadb => start one after another
+--------------------------------------------------------------------------
+https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mariadb-on-centos-7-servers
+--------------------------------------------------------------------------

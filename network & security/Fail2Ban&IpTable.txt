@@ -9,7 +9,7 @@ Fail2ban operates by monitoring log files
 							
 		logpath  = ... => mire az inja mikhoone
 		
-		cat /etc/fail2ban/filter.d/Chmail.conf
+		cat /etc/fail2ban/filter.d/zimbra.conf
 		 /etc/fail2ban/filter.d/ ===> inja hameye filterha gharar darand vaghti cat konim neveshte tooye oon logi ke male ine donbale in regex ha begard 
 		 
 		 
@@ -21,8 +21,9 @@ Fail2ban operates by monitoring log files
 		iptable -nL
 		
 ----------------------------------------------------------------
-vim.tiny /etc/iptable-rules
-iptables-restore </etc/iptable-rules
+$ iptables-save > iptablesnew
+$ vim.tiny /etc/iptablenew
+$ iptables-restore </etc/iptablenew
 ----------------------------------------------------------------
 hazf kardane tek ip ban shode az list:
 iptables --line-numbers -nL

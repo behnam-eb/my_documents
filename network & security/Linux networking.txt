@@ -1,19 +1,24 @@
------------------------------------------------------------------
-/etc/network/interfaces
------------------------------------------------------------------
+--------------------------------------------------------------------------
+/etc/resolv.conf
+/etc/hosts
+/etc/nsswitch.conf => List order of host name search. Typically look at local files, then NIS server, then DNS server.
+Red Hat/Fedora/CentOS: /etc/sysconfig/network => Specify network configuration. eg. Static IP, DHCP, NIS, etc.
+Red Hat/Fedora/CentOS: /etc/sysconfig/network-scripts/ifcfg-device => Specify TCP network information.
+Ubuntu/Debian: /etc/network/interfaces => Specify network configuration and devices. eg. Static IP and info, DHCP, etc.
+--------------------------------------------------------------------------
 connection testing :
 	nc -vz -u [ip] [port number]    ===> for testing UDP connection 
 	telnet [ip] [port number]     ===> for testing connection
------------------------------------------------------------------
+--------------------------------------------------------------------------
 internet checking :
 	wget [google.com]
------------------------------------------------------------------
+--------------------------------------------------------------------------
 tcpdump -X -vvv port 389|less
------------------------------------------------------------------
+--------------------------------------------------------------------------
 netstat -antlp
------------------------------------------------------------------
+--------------------------------------------------------------------------
 ifdown eth0;sleep 10;ifup eth0
------------------------------------------------------------------
+--------------------------------------------------------------------------
 vim.tiny /etc/network/if-up.d/iptables    => chmod +x
 	iptables-restore < /etc/iptables-restore
------------------------------------------------------------------
+--------------------------------------------------------------------------

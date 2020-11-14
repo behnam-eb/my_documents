@@ -76,5 +76,17 @@ $ kubectl apply -f [web.yaml] --dry-run --validate=true -o yaml => just for test
 $ kubectl apply -f [web.yaml] --server-dry-run --validate=false -o yaml => it execute the yaml file but doesn't save to db so aliminates all false parts
 $ kubectl diff -f [seb.yaml] => difference between the changed file and the created resource
 --------------------------------------------------------------------------
+---- Rolling Update ------------------------------------------------------
+$ kubectl get deploy -o json | jq ".items[] | {name:.metadata.name} + .spec.strategy.rollingUpdate"  => getting information about rolling update
+
+### In production we must edit our yaml 
+$ kubectl set image deploy worker worker=dockercoins/worker:v0.2 => update from v0.1 to 0.2
+###
+$ kubectl get pods -watch
+$ kubectl get replicasets -watch
+$ kubectl get deployments -watch
+$ kubectl rollout status deploy [worker]
+$ kubectl rollout undo deploy [worker] => getting back to previous state if something gonna wrong => it can flip just to the one stage earlier
+--------------------------------------------------------------------------
 $ etcdctl ls /regitry
 $ etcdctl get /registry/ranges/servicenodeports

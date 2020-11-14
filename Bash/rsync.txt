@@ -1,0 +1,58 @@
+--------------------------------------------------------------------------
+$ yum install rsync -y
+$ apt-get install rsync -y
+--------------------------------------------------------------------------
+# rsync {options} {Source} {Destination}
+--------------------------------------------------------------------------
+-v, –verbose                             Verbose output
+-q, –quiet                                  suppress message output
+-a, –archive                              archive files and directory while synchronizing ( -a equal to following options -rlptgoD)
+-r, –recursive                           sync files and directories recursively
+-b, –backup                              take the backup during synchronization
+-u, –update                              don’t copy the files from source to destination if destination files are newer
+-l, –links                                   copy symlinks as symlinks during the sync
+-n, –dry-run                             perform a trial run without synchronization
+-e, –rsh=COMMAND            mention the remote shell to use in rsync
+-z, –compress                          compress file data during the transfer
+-h, –human-readable            display the output numbers in a human-readable format
+–progress                                 show the sync progress during transfer
+---- Examples ------------------------------------------------------------
+### Copy or Sync files locally
+$ rsync -zvh /home/pkumar/OpenStack-Networking.pdf /opt/backup
+---------
+### Copy or Sync directory locally
+$ rsync -zavh /home/pkumar /opt/backup
+---------
+### Copy files & directories recursively locally
+$ rsync -zrvh /home/pkumar /opt/backup
+or
+$ rsync -zavh /home/pkumar /opt/backup
+---------
+### Copy or sync files and directories from local to remote system
+$ rsync -zarvh /home/pkumar/techi root@192.168.1.29:/opt
+---------
+### Copy or Sync files and directories from remote machine to local system
+$ rsync -zarvh root@192.168.1.29:/opt/rpms_db /tmp
+---------
+### Specify remote shell during synchronization
+$ rsync -zarvh -e ssh  root@192.168.1.29:/opt/rpms_db  /tmp
+---------
+### Delete files at destination if it is not present in source
+$ rsync -avz --delete /opt/rpms_db root@192.168.1.28:/tmp/rpms_db
+---------
+### Remove files from source after synchronization
+$ rsync --remove-source-files -zvh /home/pkumar/techi.tgz root@192.168.1.29:/opt
+---------
+### Include and Exclude files during synchronization with rsync
+$ rsync -avz -e ssh --include '*.pdf *.rpm' --exclude '*.png' /home/pkumar/techi root@192.168.1.29:/opt
+---------
+### Put restriction on data transfer speed in rsync
+$ rsync -avz --progress --bwlimit=600 /home/pkumar/techi root@192.168.1.29:/opt
+---------
+### View the difference in files & directories between source and destination (-i option)
+$ rsync -avzi /home/pkumar/techi root@192.168.1.29:/opt
+d: indicates change in destination file
+f: indicates a file
+t: indicates change in timestamps
+s: indicates change in size
+--------------------------------------------------------------------------

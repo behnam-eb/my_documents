@@ -1,20 +1,44 @@
-Adding Hard disk:::::
+--------------------------------------------------------------------------
+## Adding Hard disk:::::
+$ echo "- - -" > /sys/class/scsi_host/host0/scan
+$ echo "- - -" > /sys/class/scsi_host/host1/scan
+$ echo "- - -" > /sys/class/scsi_host/host2/scan
+$ echo "- - -" > /sys/class/scsi_host/host3/scan
 
-echo "- - -" > /sys/class/scsi_host/host0/scan
-echo "- - -" > /sys/class/scsi_host/host1/scan
-echo "- - -" > /sys/class/scsi_host/host2/scan
-echo "- - -" > /sys/class/scsi_host/host3/scan
-
-scan a specific scsi port:
-	echo 1 > /sys/class/scsi_device/0\:0\:3\:0/device/rescan
-----------------------------------------------------------------	
-fdisk -l
-fdisk ==> creating partition for all added hard disks
+## scan a specific scsi port:
+$ echo 1 > /sys/class/scsi_device/0\:0\:3\:0/device/rescan
+--------------------------------------------------------------------------	
+$ fdisk -l
+$ fdisk ==> creating partition for all added hard disks
 	n -> p -> 1 -> w
-mkfs.ext4  ==> making filesystem for all new partitions
-mount /dev/sdb1 /mnt
-----------------------------------------------------------------
-sshfs -o sshfs_debug 'administrator@192.168.151.97:D:/backup/' backup/scan a specific scsi port:
-----------------------------------------------------------------
-du --sh /home/
-----------------------------------------------------------------
+$ mkfs.ext4  ==> making filesystem for all new partitions
+$ blkid
+$ vim /etc/fstab
+		#device        mountpoint             fstype    options  dump   fsck
+		/dev/sdb1    /home/yourname/mydata    ext4    defaults    0    1
+		UUID=413eee0c-61ff-4cb7-a299-89d12b075093  /home  ext3  nodev,nosuid,relatime  0  2
+		UUID=3f8c5321-7181-40b3-a867-9c04a6cd5f2f  /media/data  ext3  relatime,noexec  0  2
+$ mount -a
+--------------------------------------------------------------------------
+$ sshfs -o sshfs_debug 'administrator@192.168.151.97:D:/backup/' backup/scan a specific scsi port:
+--------------------------------------------------------------------------
+$ du --sh /home/
+--------------------------------------------------------------------------
+---- LVM -----------------------------------------------------------------
+### Phisical volume => volume group => logical volume ###
+$ pvs //or// $ pvdisplay
+$ vgs //or// $ vgdisplay
+$ lvs //or// $ lvdisplay
+$ pvcreate [/dev/sdc]
+$ pvremove [/dev/sdc]
+$ vgcreate [vg01] [/dev/sdc]
+$ vgrename [vg01] [test_vg01]
+$ vgremove [test_vg01]
+$ vgextend [vg_rhel01] [/dev/sdc]
+$ vgreduce [vg_rhel01] [/dev/sdc]
+$ lvcreate -n [lv01] -l [100%VG] [vg01]
+$ lvextend /dev/vg01/lv01 -L+1000M -r
+$ lvextend /dev/vg01/lv01 -L1.5GB -r
+$ lvreduce /dev/vg01/lv01 -L500M -r
+$ lvreduce /dev/vg01/lv01 -L-235M -r
+--------------------------------------------------------------------------

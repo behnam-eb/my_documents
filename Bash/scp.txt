@@ -1,0 +1,11 @@
+--------------------------------------------------------------------------
+# scp source_file_name username@destination_host:destination_folder
+--------------------------------------------------------------------------
+-v => Provide the detail information of SCP process
+-C => Make file transfer faster by compressing files
+-P port => Specify specific port to use with SCP
+-r => Copy files inside directory recursively
+--------------------------------------------------------------------------
+Example:
+$ scp -Cpv messages.log mrarianto@202.x.x.x:.
+--------------------------------------------------------------------------

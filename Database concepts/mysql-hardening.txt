@@ -1,0 +1,15 @@
+--------------------------------------------------------------------------
+https://www.alibabacloud.com/help/faq-detail/49568.htm
+--------------------------------------------------------------------------
+1. Drop the Test database
+2. Remove all anonymous accounts
+3. Change default port mappings
+4. Alter which hosts have access to MySQL
+5.Do not run MySQL with root level privileges
+6. Remove and disable the MySQL history file
+7. Disable remote logins
+8. Limit or disable SHOW DATABASES
+9. Disable the use of LOAD DATA LOCAL INFILE command
+10. Obfuscate the root account
+11. Set the proper file permissions
+--------------------------------------------------------------------------

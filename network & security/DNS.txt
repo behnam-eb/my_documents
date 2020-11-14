@@ -59,15 +59,15 @@ BIND 9 configuration
 چک کردن dkim
 nslookup
 set type=txt
-chmail._domainkey.ansarbank.ir
+zimbra._domainkey.ansarbank.ir
 
 mkdir -p /etc/dk/tv5.ir
 cd /etc/dk/tv5.ir
-opendkim-genkey -b 1024 -d tv5.ir -s chmail
-mv chmail.private chmail
+opendkim-genkey -b 1024 -d tv5.ir -s zimbra
+mv zimbra.private zimbra
 chown opendkim:opendkim *
 chmod u=rw,go-rwx *
-echo "tv5.ir tv5.ir:chmail:/etc/dk/tv5.ir/chmail" >>/etc/dk/KeyTable
+echo "tv5.ir tv5.ir:zimbra:/etc/dk/tv5.ir/zimbra" >>/etc/dk/KeyTable
 echo "*@tv5.ir tv5.ir" >>/etc/dk/SigningTable
 chown -R opendkim:opendkim /etc/dk/
 chmod go-rwx /etc/dk/*
@@ -76,9 +76,9 @@ chmod go-rwx /etc/dk/*
 
 
 =========================
-opendkim-testkey -d shahed.ac.ir -k /etc/dk/shahed.ac.ir/chmail -s chmail -vvvvv -x /etc/opendkim.conf
+opendkim-testkey -d shahed.ac.ir -k /etc/dk/shahed.ac.ir/zimbra -s zimbra -vvvvv -x /etc/opendkim.conf
 
-cat /etc/dk/tv5.ir/chmail.txt
+cat /etc/dk/tv5.ir/zimbra.txt
 ----------------------------------------------------------------
 SPF record :
 syntax ==>   "v=spf1 -all"
