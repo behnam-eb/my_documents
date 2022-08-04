@@ -1,0 +1,11 @@
+SELinux has three modes:
+
+Enforcing: SELinux allows access based on SELinux policy rules.
+Permissive: SELinux only logs actions that would have been denied if running in enforcing mode.
+Disabled: No SELinux policy is loaded.
+By default, in CentOS 7, SELinux is enabled and in enforcing mode.
+
+$ sestatus
+$ sudo setenforce 0   => temporarily change the SELinux mode from targeted to permissive
+$ vim /etc/selinux/config   => SELINUX=disabled => to do permanently => after that reboot the system
+
