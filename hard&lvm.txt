@@ -37,8 +37,13 @@ $ vgremove [test_vg01]
 $ vgextend [vg_rhel01] [/dev/sdc]
 $ vgreduce [vg_rhel01] [/dev/sdc]
 $ lvcreate -n [lv01] -l [100%VG] [vg01]
+# lvextend -l +10%VG|LV|PVS|FREE|ORIGIN
+$ sudo lvextend -l +100%FREE /dev/COMPbase-vg/root
 $ lvextend /dev/vg01/lv01 -L+1000M -r
 $ lvextend /dev/vg01/lv01 -L1.5GB -r
 $ lvreduce /dev/vg01/lv01 -L500M -r
 $ lvreduce /dev/vg01/lv01 -L-235M -r
+$ sudo resize2fs /dev/COMPbase-vg/root   => extending ext file system
+$ xfs_growfs /dev/cl/root   => extending xfs file system
+
 --------------------------------------------------------------------------
