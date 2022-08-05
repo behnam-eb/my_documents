@@ -1,11 +1,15 @@
 $#  ===>  Expands to the number of positional parameters in decimal.
 --------------------------------------------------------------------------
-vim.tiny
+$ cp -i file1 file2 ... filen destdirectory => -i=interactive  -f=force
+$ cp -b file1 file2 => -b=backup => it copies file1 to file2 and also create a backup file with the name of file2~
+$ cp [-r] [-p]    => -r = recursive , -p =  same as --preserve=mode,ownership,timestamps
+--------------------------------------------------------------------------
+$ vim ....
 	:set nbomb   => delete special characters
 	:set ff=unix => for files thet opened in windows
 	:%s/xxx/yyy/g   => substitude
 --------------------------------------------------------------------------
-expr $aftersyncemailcnt - $chmailemailcnt ===> tafrigheshoon mikone
+$ expr $aftersyncemailcnt - $chmailemailcnt ===> tafrigheshoon mikone
 --------------------------------------------------------------------------
 bash: sorting strings with numbers 
 	Ex : abc_1 , abc_10 , abc_5
@@ -15,11 +19,10 @@ bash: sorting strings with numbers
 			-k key/column
 			-g general numeric sort
 --------------------------------------------------------------------------
-	commands:
-		grep -v [pattern] [filepath]    ===>  -v = any output except pattern
+$ grep -v [pattern] [filepath]    ===>  -v = any output except pattern
 		-E -i -v 
 --------------------------------------------------------------------------
-comm -12 mob sologin | less
+$ comm -12 mob sologin | less
 	in command miad file 1 va 2 va khorooji ro be onvane 3ta sotoon migire
 	file 1 va 2 ro moghayese kon moshtarakasho beriz tooye sotoone 3
 	-32  =>  3-2=  oonhaye ke dar file 1 hastand vali dar 2 nistand
@@ -38,9 +41,15 @@ awk '{s+=$1} END {printf "%.0f", s}' filename
 How to merge every two lines into one from the command line?
 	awk 'NR%2{printf "%s ",$0;next;}1' yourFile
 --------------------------------------------------------------------------
-ls -t ====> bar asase tarikh sort mikone
+$ ls -t ====> bar asase tarikh sort mikone
 --------------------------------------------------------------------------
- awk 'BEGIN { OFS = ";"; ORS = "\n\n" }
+$ tree [directory name]   => to see the tree of that directory
+--------------------------------------------------------------------------
+$ touch -t .... filename => if the file exist, it will update its timestamp else it will be created with this timestamp
+$ touch -d .... filename => usind date instead of timestamp
+$ touch -r file1 file2   => it will replace time of file2 with time of file1
+--------------------------------------------------------------------------
+$ awk 'BEGIN { OFS = ";"; ORS = "\n\n" }
 >            { print $1, $2 }' BBS-list
 -| aardvark;555-5553
 -| 
@@ -56,3 +65,14 @@ $ cd - => going to the previous directory
 $ echo -n '..........' | base64
 $ echo 'Base64String' | base64 --decode
 --------------------------------------------------------------------------
+$ find .   => finds all files here
+$ find . -name "f*"
+$ find . -iname "f*"   => case insensitive
+$ find . - type [d | f | l] -iname "d*"
+$ find . -size [-100b | 100b | +100b | +1G]
+$ find . -size 0   => equal to -empty
+$ find . [-atime 6 | -ctime 6 | -mtime 6] ==> 6*24 hours => a=access , c=change , m=modify(change the content of file)
+$ find . [-mmin 90 | -amin 90 | -cmin 90]
+$ find . -mmin -23 -name "J*" -exec rm "{}" \;  => remove files that modified before 20 min and their name starts with J
+$ find . -mmin -23 [-ls | -print | -exec echo "{}"\; ]
+$ find . -cmin -30 -exec cp -r "{}" backup/ \;
