@@ -1,0 +1,58 @@
+--------------------------------------------------------------------------
+$ which packagename
+$ whereis packagename
+--------------------------------------------------------------------------
+---- RedHat Based --------------------------------------------------------
+important files and directories:
+* /etc/yum.repos.d/...
+* /etc/yum.conf
+-----------------------
+$ rpm -ivh package.rpm   => it can't resolve dependencies
+$ yum install packagename
+$ rpm -e packagename   => remove package without no question and without removing dependencies
+$ yum upgrade
+$ yum upgrade 'z*'
+$ rpm -i = install
+      -U = upgrade if exist else install
+      -F = upgrade if it exists and there is a new version
+      -v = verbose
+$ yum list packagename 
+$ yum info packagename
+$ yum search [....]   => seach between all packages that there is ... in their name or manuals
+$ rpm -qa | grep [...]
+$ rpm -ql packagename   => show all files that this package copied on system
+$ rpm -qf filename   => show the package that copied this file on system
+$ rpm -qR packagename   => it tell us what dependencies this package is needed
+$ yum deplist packagename
+$ yum whatprovides packagename   => it tells that what repository brings this package to us
+$ rpm -Kv package.rpm   => it checks gpg key with the distro key
+$ rpm -V packagename   => it verifies if the installes files for this program are true or not
+$ yum reinstall packagename   => if program files are deleted or damaged
+$ yumdownloader packagename   => it just download the package
+$ yumdownloader --resolve packagename   => it will download the package and all of its dependencies
+$ rmp2cpio package.rpm | cpio -id   => show all existing files inside of package
+--------------------------------------------------------------------------
+---- Debian Based --------------------------------------------------------
+important files and directories:
+* /etc/apt/ ...
+            sources.list
+            sources.list.d/
+-----------------------
+$ apt-get update  => it will read all sources.list files and create a list of packages and their download path
+$ apt-get install packagename   => it will create /var/lib/dpkg/lock to disallow others from cuncurrent installing
+$ apt-get install --download-only packagename   => it will just download the package and its dependencies
+$ apt-get install -s packagename   => it will just simulate the installation process
+$ apt-get remove packagename   => remove without dependencies
+$ apt-get autoremove packagename   => also remove dependencies that uses by no one else
+$ apt-get autoremove   => it clean the system and remove dependencies that no one use
+$ apt-cache search ...   => show all packages that there is ... in their name or manual
+$ aptitude [install | remove | search] packagename
+$ apt-get upgrade   => upgrade all packages
+$ apt-get dist-upgrade   => upgrade distro if exist
+$ dpkg-reconfigure packagename   => to reconfig an installed package
+$ dpkg --contents package.deb   => show the content of package
+$ dpkg -s packagename   => show the status of package in the package tree
+$ dpkg [-P | --purge] packagename   => remove all signs of package like there isn't before
+$ dpkg -L packagename   => show all created files and directories during installation
+$ dpkg -S filepath   => show the package that created this file on system
+--------------------------------------------------------------------------
