@@ -1,4 +1,6 @@
 --------------------------------------------------------------------------
+https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mariadb-on-centos-7-servers
+https://thelazyadmin.blog/how-to-install-configure-a-galera-cluster-with-mysql-on-centos-7
 ---- All servers ---------------------------------------------------------
 $ sudo vi /etc/yum.repos.d/mariadb.repo
 		[mariadb]
