@@ -1,4 +1,15 @@
 --------------------------------------------------------------------------
+In MBR we can only use disks below 2T and also we can only have 4 Primary partitions [sda1..4] .For having more we must create one extended partition that have a number between 1 to 4 and now we can create as many partitions as we want [sda5....]
+--------------------------------------------------------------------------
+For solving the MBR limitations, GPT (GUID Partition Table) became to existence . GPT supports disks with huge capacities and also you can create as many partitions as you want.
+for partitioning GPT disks, we can use below commands :
+$ parted [/dev/sda] p
+$ gparted    => with grafical interface
+--------------------------------------------------------------------------
+When we install a Linux, we usually create 2 default partitions : 1. /boot   2. swap
+the swap size is usually memory*2 , but we almost never create a swap with size of more than 8G
+the amount of /boot is usually 100M and it must be on the local system not on the network
+--------------------------------------------------------------------------
 ## Adding Hard disk:::::
 $ echo "- - -" > /sys/class/scsi_host/host0/scan
 $ echo "- - -" > /sys/class/scsi_host/host1/scan
@@ -9,7 +20,7 @@ $ echo "- - -" > /sys/class/scsi_host/host3/scan
 $ echo 1 > /sys/class/scsi_device/0\:0\:3\:0/device/rescan
 --------------------------------------------------------------------------	
 $ fdisk -l
-$ fdisk ==> creating partition for all added hard disks
+$ fdisk [/dev/sda] ==> creating partition for all added hard disks
 	n -> p -> 1 -> w
 $ mkfs.ext4  ==> making filesystem for all new partitions
 $ blkid
@@ -46,4 +57,7 @@ $ lvreduce /dev/vg01/lv01 -L-235M -r
 $ sudo resize2fs /dev/COMPbase-vg/root   => extending ext file system
 $ xfs_growfs /dev/cl/root   => extending xfs file system
 
+$ blkid   => for finding the UUID of a partition for addong to mount file
+$ vim /etc/fstab
+$ mount -a   => after changing /etc/fstab file
 --------------------------------------------------------------------------
