@@ -1,0 +1,30 @@
+--------------------------------------------------------------------------
+$ cat /proc/cpuinfo
+$ cat /proc/meminfo
+$ cat /proc/mounts
+$ ls /proc/sys/net/ipv4
+$ ls /dev/sda*
+$ lsusb
+$ lspci
+$ lshw
+--------------------------------------------------------------------------
+$ lsmod | less  => show all loaded modules
+$ rmmod modulename  => remove a module
+$ modprobe modulename   => load a module and its dependencies into kernel
+$ ls /etc/modprobe.d/...   => for permanent loading we must create module settings here
+--------------------------------------------------------------------------
+bootloaders :
+$ less /etc/lilo.conf
+$ less /boot/grub/grub.cfg
+$ less /boot/grub/menu.lst
+--------------------------------------------------------------------------
+$ pstree|less   => init is the mother of all other processes and have PID=1 (don't kill it !)
+$ dmesg   => it shows kernel ring buffer (because during loading kernel there isn't anybody to log events, kernel itself save logs in somewhere named kernel ring buffer)
+$ less /var/log/dmesg   => it only shows logs that generated before booting the system
+$ less /var/log/messages   => other programs' logs
+$ less /var/log/syslog   => in some systems like /var/log/messages
+--------------------------------------------------------------------------
+$ runlevel   => show current and previous run levels
+$ telinit ...   => changing the run level
+$ less /etc/inittab   => main init configuration . it is deprecated because most systems today use systemd or upstart
+$ ls -ltrh /etc/init.d/   => there is a file for every service here in initd systems
