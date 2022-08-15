@@ -1,4 +1,34 @@
 --------------------------------------------------------------------------
+Systemd is a system and service manager for Linux operating systems. It is designed to be backwards compatible
+with SysV init scripts, and provides a number of features such as parallel startup of system services at boot 
+time, on-demand activation of daemons, or dependency-based service control logic.
+
+Systemd introduces the concept of systemd units. These units are represented by unit configuration files located 
+in one of the directories :
+* /lib/systemd/system/
+* /run/systemd/system/
+* /etc/systemd/system/
+and encapsulate information about system services, listening sockets, and other objects that are relevant to the init system.
+
+Available systemd Unit Types:
+  Service unit => .service => A system service.
+  Target unit => .target => A group of systemd units.
+  Automount unit => .automount => A file system automount point.
+  Device unit => .device => A device file recognized by the kernel.
+  Mount unit => .mount => A file system mount point.
+  Path unit => .path => A file or directory in a file system.
+  Scope unit => .scope => An externally created process.
+  Slice unit => .slice => A group of hierarchically organized units that manage system processes.
+  Snapshot unit => .snapshot => A saved state of the systemd manager.
+  Socket unit => .socket => An inter-process communication socket.
+  Swap unit => .swap => A swap device or a swap file.
+  Timer unit => .timer => A systemd timer.
+  
+  The default configuration of systemd is defined during the compilation and it can be found in systemd configuration file at /etc/systemd/system.conf. 
+  
+more information :
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/chap-managing_services_with_systemd
+--------------------------------------------------------------------------
 /lib/systemd/system/
                     [...].target
                     [...].target.wants
@@ -6,6 +36,8 @@
                     
 /etc/systemd/system/....   -> link to /lib/systemd/system/....         
 --------------------------------------------------------------------------
-When we enable a service, it creates a link in /etc/systemd/system/multi-user.target.wants/[...].service   to the service file in /lib/systemd/system/[...].service
+When we enable a service, it creates a link in /etc/systemd/system/multi-user.target.wants/[...].service   to 
+the service file in /lib/systemd/system/[...].service
 --------------------------------------------------------------------------
-systemctl -l
+$ systemctl -l
+$ systemctl cat [sshd]
