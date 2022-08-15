@@ -6,4 +6,6 @@
                     
 /etc/systemd/system/....   -> link to /lib/systemd/system/....         
 --------------------------------------------------------------------------
-$ systemctl -l
+When we enable a service, it creates a link in /etc/systemd/system/multi-user.target.wants/[...].service   to the service file in /lib/systemd/system/[...].service
+--------------------------------------------------------------------------
+systemctl -l
