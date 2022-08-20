@@ -1,4 +1,5 @@
 --------------------------------------------------------------------------
+important files and directories:
 /etc/resolv.conf
 /etc/hosts
 /etc/nsswitch.conf => List order of host name search. Typically look at local files, then NIS server, then DNS server.
@@ -6,19 +7,74 @@ Red Hat/Fedora/CentOS: /etc/sysconfig/network => Specify network configuration. 
 Red Hat/Fedora/CentOS: /etc/sysconfig/network-scripts/ifcfg-device => Specify TCP network information.
 Ubuntu/Debian: /etc/network/interfaces => Specify network configuration and devices. eg. Static IP and info, DHCP, etc.
 --------------------------------------------------------------------------
+$ vim /etc/sysconfig/network-scripts/ifcfg-ens33   => to set static ip
+	TYPE="Ethernet"
+	BOOTPROTO="static"
+	DEFROUTE="yes"   =====> just set on one interfate 
+	NAME="ens33"
+	UUID="acdf8620-5679-42f9-b398-cf250296a675"
+	DEVICE="ens33"
+	ONBOOT="yes"
+	IPADDR=192.168.1.51
+	NETMASK=255.255.255.0
+	GATEWAY=192.168.1.1
+	DNS1=8.8.8.8
+	DNS2=4.2.2.4
+$ systemctl restart network ( or $ifdown and $ifup that device )
+--------------------------------------------------------------------------
+$ vim /etc/sysconfig/network-scripts/ifcfg-ens33   => to set dynamic ip
+	TYPE="Ethernet"
+	BOOTPROTO="dhcp"
+	NAME="ens33"
+	UUID="acdf8620-5679-42f9-b398-cf250296a675"
+	DEVICE="ens33"
+	ONBOOT="yes"
+$ systemctl restart network ( or $ifdown and $ifup that device )
+--------------------------------------------------------------------------
+$ ifconfig -a
+$ ip address | $ ip a
+$ ip address show dev [enp9s0]
+$ ip link show   => link is for working with net devices
+$ ip link set [enp9s0] address [MAC]   => for changing the MAC address
+$ ip link set [enp9s0] [up|down]
+$ ip link set [enp9s0] arp [on|off]
+$ ip address flush dev [enp9s0]   => flushing the device ip settings
+$ ip address [add|del] [192.168.1.51/24] dev [enp9s0]
+--------------------------------------------------------------------------
+$ arp -n
+$ ip neigh show
+$ ip neigh flush dev [enp9s0]
+--------------------------------------------------------------------------
+$ ip route list
+$ ip route add [192.168.1.0/24] dev [enp9s0]
+$ ip route add default via [192.168.1.1] dev [enp9s0]
+$ ip route del [default | 192.168.1.0/24 dev enp9s0]
+--------------------------------------------------------------------------
+$ dhclient -v   => to get an ip from dhcp server (-v=verbose)
+$ dhclient -v enp9s0   => try from this network interface
+$ dhclient -r   => to release an ip address
+--------------------------------------------------------------------------
+troubleshooting:
+	$ ping 8.8.8.8
+	$ ping google.com
+	$ ping [gateway addr]
+	$ mtr 4.2.2.4   ($ yum install mtr)
+	$ tracepath 4.2.2.4
+	$ traceroute 4.2.2.4
+--------------------------------------------------------------------------
 connection testing :
-	nc -vz -u [ip] [port number]    ===> for testing UDP connection 
-	telnet [ip] [port number]     ===> for testing connection
+	$ nc -vz -u [ip] [port number]    ===> for testing UDP connection 
+	$ telnet [ip] [port number]     ===> for testing connection
 --------------------------------------------------------------------------
 internet checking :
-	wget [google.com]
+	$ wget [google.com]
 --------------------------------------------------------------------------
-tcpdump -X -vvv port 389|less
+$ tcpdump -X -vvv port 389|less
 --------------------------------------------------------------------------
-netstat -antlp
+$ netstat -antp | -lntp
 --------------------------------------------------------------------------
-ifdown eth0;sleep 10;ifup eth0
+$ ifdown eth0;sleep 10;ifup eth0
 --------------------------------------------------------------------------
-vim.tiny /etc/network/if-up.d/iptables    => chmod +x
+$ vim /etc/network/if-up.d/iptables    => $ chmod +x
 	iptables-restore < /etc/iptables-restore
 --------------------------------------------------------------------------
