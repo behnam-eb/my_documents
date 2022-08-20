@@ -41,3 +41,11 @@ the service file in /lib/systemd/system/[...].service
 --------------------------------------------------------------------------
 $ systemctl -l
 $ systemctl cat [sshd]
+$ systemctl list-units
+$ systemctl list-unit-files
+$ systemctl list-sockets
+$ systemctl daemon-reload   ==> when we change a file in /usr/lib/systemd/system/ , we must run it to update files in /etc/systemd/system/
+$ systemctl get-default  ==> it shows the default target
+$ systemctl list-dependencies [ServiceName]
+$ systemctl [mask | unmask] [ServiceName]  => masking a service make a link to /dev/zero and service vanished
+--------------------------------------------------------------------------
