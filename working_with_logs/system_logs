@@ -1,0 +1,16 @@
+--------------------------------------------------------------------------
+important logs in Centos:
+/var/log/messages
+/var/log/boot.log
+/var/log/secure
+/var/log/yum.log
+/var/log/dmesg
+/var/log/wtmp ==> a binary file ==> to see :   $ last | less   => logins and system boot times
+/var/log/anaconda/...   ==> logs generated during installation of OS
+/var/log/cron
+/var/log/firewalld
+--------------------------------------------------------------------------
+$ journalctl
+$ journalctl -xe  => show the last logs
+$ journalctl -xf  => show live logs (like $ tail -f)
+$ lastlog   => show last login times of all users
