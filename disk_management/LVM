@@ -1,0 +1,56 @@
+---- LVM -----------------------------------------------------------------
+### Phisical volume => volume group => logical volume ###
+$ pvs //or// $ pvdisplay
+$ vgs //or// $ vgdisplay
+$ lvs //or// $ lvdisplay
+$ pvcreate [/dev/sdc]
+$ pvremove [/dev/sdc]
+$ vgcreate [vg01] [/dev/sdc]
+$ vgrename [vg01] [test_vg01]
+$ vgremove [test_vg01]
+$ vgextend [vg_rhel01] [/dev/sdc]
+$ vgreduce [vg_rhel01] [/dev/sdc]   => ********
+$ lvcreate -n [lv01] -l [100%VG] [vg01]
+$ lvextend -l +10%VG|LV|PVS|FREE|ORIGIN
+$ lvextend -l +100%FREE /dev/COMPbase-vg/root
+$ lvextend /dev/vg01/lv01 -L+1000M -r
+$ lvextend /dev/vg01/lv01 -L1.5GB -r
+$ lvreduce /dev/vg01/lv01 -L500M -r   => ********
+$ lvreduce /dev/vg01/lv01 -L-235M -r   => ********
+$ sudo resize2fs /dev/COMPbase-vg/root   => extending ext file system
+$ xfs_growfs /dev/cl/root   => extending xfs file system
+
+$ blkid   => for finding the UUID of a partition for addong to mount file
+$ vim /etc/fstab
+$ mount -a   => after changing /etc/fstab file
+--------------------------------------------------------------------------
+Reducing :
+### Reducing/Shrinking the logical volume is the highest risk of data corruption. ###
+So try to avoid this kind of situation if possible, but go ahead if you have no other options.
+It is always recommended to make a backup before shrinking an LVM.
+
+Reducing the logical volume involves the below steps:
+  Unmount the file system.                        => # umount /testlvm1
+  Check the file system for any errors.           => # e2fsck -f /dev/mapper/vg01-lv002
+  Shrink the file system size.                    => # resize2fs /dev/mapper/vg01-lv002 80G
+  Reduce the logical volume size.                 => # lvreduce -L 80G /dev/mapper/vg01-lv002
+  Re-check the file system for errors (Optional). => # e2fsck -f /dev/mapper/vg01-lv002
+  Mount the file system                           => # mount /testlvm1
+  Check the reduced file system size              => # df -h /testlvm1
+--------------------------------------------------------------------------
+Reducing xfs:
+  1) Backup the data using xfsdump
+  2) Unmount the filesystem
+  3) Shrink logical volume to desired size using lvreduce
+  4) Format the partition with xfs filesystem
+  5) Remount the filesystem
+  6) Restore the data using xfsrestore
+  
+# yum install xfsdump -y
+# xfsdump -f /tmp/test.dump /test
+# umount /test
+# lvreduce -L 400M /dev/vg00/lv00
+# mkfs.xfs -f /dev/vg00/lv00
+# mount /dev/vg00/lv00 /test
+# xfsrestore -f /tmp/test.dump /test
+--------------------------------------------------------------------------
