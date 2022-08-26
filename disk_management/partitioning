@@ -36,29 +36,4 @@ $ sshfs -o sshfs_debug 'administrator@192.168.151.97:D:/backup/' backup/scan a s
 --------------------------------------------------------------------------
 $ du --sh /home/
 --------------------------------------------------------------------------
----- LVM -----------------------------------------------------------------
-### Phisical volume => volume group => logical volume ###
-$ pvs //or// $ pvdisplay
-$ vgs //or// $ vgdisplay
-$ lvs //or// $ lvdisplay
-$ pvcreate [/dev/sdc]
-$ pvremove [/dev/sdc]
-$ vgcreate [vg01] [/dev/sdc]
-$ vgrename [vg01] [test_vg01]
-$ vgremove [test_vg01]
-$ vgextend [vg_rhel01] [/dev/sdc]
-$ vgreduce [vg_rhel01] [/dev/sdc]
-$ lvcreate -n [lv01] -l [100%VG] [vg01]
-# lvextend -l +10%VG|LV|PVS|FREE|ORIGIN
-$ sudo lvextend -l +100%FREE /dev/COMPbase-vg/root
-$ lvextend /dev/vg01/lv01 -L+1000M -r
-$ lvextend /dev/vg01/lv01 -L1.5GB -r
-$ lvreduce /dev/vg01/lv01 -L500M -r
-$ lvreduce /dev/vg01/lv01 -L-235M -r
-$ sudo resize2fs /dev/COMPbase-vg/root   => extending ext file system
-$ xfs_growfs /dev/cl/root   => extending xfs file system
 
-$ blkid   => for finding the UUID of a partition for addong to mount file
-$ vim /etc/fstab
-$ mount -a   => after changing /etc/fstab file
---------------------------------------------------------------------------
