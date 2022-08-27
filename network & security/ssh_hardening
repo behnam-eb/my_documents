@@ -1,0 +1,57 @@
+--------------------------------------------------------------------------
+SSHD Hardening tips:
+--------------------------------------------------------------------------
+1. Disable empty passwords
+    Yes. It is possible to have user accounts in Linux without any passwords. 
+    those users try to use SSH, they won’t need passwords for accessing the server via SSH as well.
+    That’s a security risk. You should forbid the use of empty passwords. 
+    
+    PermitEmptyPasswords no
+    
+2. Change default SSH ports
+    Port 2345
+    
+3. Disable root login via SSH
+    To be honest, using server as root itself should be forbidden. It is risky and leaves no audit trail.
+    Mechanism like sudo exist for this reason only.
+    If you have sudo users added on your system, you should use that sudo user to access the server via SSH instead of root.
+    
+    PermitRootLogin no
+    
+4. Disable ssh protocol 1
+    Newer SSH versions automatically have SSH protocol 2 enabled but no harm in double checking it.
+    
+    Protocol 2
+    
+5. Configure idle timeout interval
+    The idle timeout interval is the amount of time an SSH connection can remain active without any activity.
+    Such idle sessions are also a security risk. It is a good idea to configure idle timeout interval.
+    The timeout interval is count in seconds and by default it is 0. You may change it to 300 for keeping a five minute timeout interval.
+    
+    ClientAliveInterval 300
+
+    After this interval, the SSH server will send an alive message to the client. If it doesn’t get a response,
+    the connection will be closed and the end user will be logged out.
+    You may also control how many times it sends the alive message before disconnecting:
+    
+    ClientAliveCountMax 2
+
+6. Allow SSH access to selected users only
+    AllowUsers User1 User2
+    [or]  AllowGroups ssh_group
+
+7. Disable X11 Forwarding
+    The X11 or the X display server is the basic framework for a graphical environment. The X11 forwarding allows you to use a GUI application via SSH.
+    
+    X11Forwarding no
+
+8. Mitigate brute force attacks automatically
+    To thwart SSH bruteforce attacks, you can use a security tool like Fail2Ban.
+    Fail2Ban checks the failed login attempts from different IP addresses. If these bad attempts cross a threshold within a set time interval,
+    it bans the IP from accessing SSH for a certain time period.
+    
+9. Disable password based SSH login
+    In this approach, you add the public key of the remote client systems to the known keys list on the SSH server. This way,
+    those client machines can access SSH without entering the user account password.
+    When you have this setup, you can disable password based SSH login. Now, only the clients machines that have the specified SSH keys can access the server via SSH.
+--------------------------------------------------------------------------         
