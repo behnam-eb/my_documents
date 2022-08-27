@@ -1,4 +1,7 @@
 --------------------------------------------------------------------------
+$ less /var/log/secure
+$ w
+--------------------------------------------------------------------------
 ‘/etc/ssh/known_hosts’ and ‘.ssh/known_hosts’ in each user’s home directory :
 
 The known_hosts File is a client file containing all remotely connected known hosts, 
