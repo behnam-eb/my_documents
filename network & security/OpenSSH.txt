@@ -1,2 +1,33 @@
+--------------------------------------------------------------------------
+‘/etc/ssh/known_hosts’ and ‘.ssh/known_hosts’ in each user’s home directory :
+
+The known_hosts File is a client file containing all remotely connected known hosts, 
+and the ssh client uses this file. This file authenticates for the client to the server
+they are connecting to. The known_hosts file contains the host public key for all known 
+hosts. The use of this file is optional, but, if used then it is prepared by the system 
+administrator. It automatically maintains the per-user file in the system. Each time a 
+user connects with an unknown host and the unknown host key is added to this file. However
+, if the machine hacks or gets compromised, hackers can use the know_hosts file, view the 
+list of all machines connected to this machine, and target those machines. To avoid this 
+risk, not all IP addresses in the known_host key are defined in the plaintext format.
+--------------------------------------------------------------------------
 $ ssh -i remote-key remote_user@remote_host
-$  ssh-keygen -f remote-key
+$ ssh-keygen -f remote-key
+--------------------------------------------------------------------------
+SSH login without password:
+
+You want to use Linux and OpenSSH to automate your tasks.
+Therefore you need an automatic login from host A / user a to Host B / user b. 
+You don't want to enter any passwords, because you want to call ssh from a within a shell script.
+
+$ a@A:~> ssh-keygen -t rsa   => it create two file in /root/.ssh/ : 1.id_rsa  2.id_rsa.pub
+---
+$ a@A:~> ssh b@B mkdir -p .ssh
+$ a@A:~> cat .ssh/id_rsa.pub | ssh b@B 'cat >> .ssh/authorized_keys'
+$ a@A:~> ssh b@B
+--- OR
+$ ssh-copy-id b@B   => the key copied source public key in .ssh/authorized_keys file of destination server
+
+after that when you want to login from a@A to b@B, it doesn't ask b password . if you entered a pass for public key at 
+generation time, during connection it will ask that password from you
+--------------------------------------------------------------------------
