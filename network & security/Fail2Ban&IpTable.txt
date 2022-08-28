@@ -1,12 +1,40 @@
 ----------------------------------------------------------------
-fail2ban :
+Fail2ban scans log files (e.g. /var/log/apache/error_log) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
+
+Fail2Ban is able to reduce the rate of incorrect authentications attempts however it cannot eliminate the risk that weak authentication presents. Configure services to use only two factor or public/private authentication mechanisms if you really want to protect services.
+----------------------------------------------------------------
+$ yum install epel-release
+$ yum install fail2ban fail2ban-systemd
+$ systemctl enable fail2ban
+$ systemctl start fail2ban
+$ yum update -y selinux-policy*
+$ cp -pf /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+$ vim /etc/fail2ban/jail.local
+----------------------------------------------------------------
+example: [Add a jail file to protect SSH]
+$ vim /etc/fail2ban/jail.d/sshd.local
+	[sshd]
+	enabled = true
+	port = ssh   => if you don't use 22, write the new port instead of ssh here
+	#action = firewallcmd-ipset
+	logpath = %(sshd_log)s
+	maxretry = 5
+	bantime = 86400
+	
+$ systemctl restart fail2ban
+$ cat /var/log/secure | grep 'Failed password'
+----------------------------------------------------------------
+$ iptables -nL   => to see banned ip addresses
+$ fail2ban-client status   => check the status of fail2ban jails
+$ fail2ban-client set sshd unbanip [IPADDRESS]   => to unban an ip address
+----------------------------------------------------------------
 Fail2ban operates by monitoring log files
-	vim.tiny /etc/fail2ban/jail.conf
+	$ vim /etc/fail2ban/jail.conf
 		ignoreip =-ip- -ip- ... => liste ip haee ke mikhahim kari beheshoon nadashte bashim va filterha rooshoon emal nashan
 		findtime = 600
 		maxretry = 25 => tooye 600 sanie age 25 bar oon etefagh oftad blockesh kon . in be hame 
 							filterha emal mishe mage inke baraye filter , be tore khas tarif shode bashe
-							
+		bantime = 600   => the number of seconds that a host is banned				
 		logpath  = ... => mire az inja mikhoone
 		
 		cat /etc/fail2ban/filter.d/zimbra.conf
