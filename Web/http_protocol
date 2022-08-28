@@ -1,0 +1,84 @@
+--------------------------------------------------------------------------
+The Hypertext Transfer Protocol (HTTP) is the foundation of the World Wide Web, and is used to load web pages using hypertext links. 
+HTTP is an application layer protocol designed to transfer information between networked devices and runs on top of other layers of 
+the network protocol stack. A typical flow over HTTP involves a client machine making a request to a server, which then sends a response message.
+
+**HTTP Request:
+    An HTTP request is the way internet communications platforms such as web browsers ask for the information they need to load a website.
+    
+    Each HTTP request made across the Internet carries with it a series of encoded data that carries different types of information.
+    A typical HTTP request contains:
+          1. HTTP version type
+          2. a URL
+          3. an HTTP method
+              An HTTP method, sometimes referred to as an HTTP verb, indicates the action that the HTTP request expects from the queried server.
+              For example, two of the most common HTTP methods are ‘GET’ and ‘POST’; a ‘GET’ request expects information back in return 
+              (usually in the form of a website), while a ‘POST’ request typically indicates that the client is submitting information to the 
+              web server (such as form information, e.g. a submitted username and password).
+          4. HTTP request headers
+              HTTP headers contain text information stored in key-value pairs, and they are included in every HTTP request (and response, more
+              on that later). These headers communicate core information, such as what browser the client is using what data is being requested.
+              Example of HTTP request headers from Google Chrome's network tab:
+                  Request Headers:
+                  :authority: www.isna.ir
+                  :method: GET
+                  :path: /
+                  :scheme: https
+                  accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+                  accept-encoding: gzip, deflate, br
+                  accept-language: en-US,en;q=0.9,fa;q=0.8
+                  cache-control: no-cache
+                  cookie: __arcsco=f435fe06b7db126a52c5897267465704
+                  pragma: no-cache
+
+          5. Optional HTTP body.
+              The body of a request is the part that contains the ‘body’ of information the request is transferring. The body of an HTTP request contains any 
+              information being submitted to the web server, such as a username and password, or any other data entered into a form.
+              
+**HTTP Response:        
+    An HTTP response is what web clients (often browsers) receive from an Internet server in answer to an HTTP request. These responses communicate valuable
+    information based on what was asked for in the HTTP request.
+
+    A typical HTTP response contains:
+        1. an HTTP status code
+            HTTP status codes are 3-digit codes most often used to indicate whether an HTTP request has been successfully completed. Status codes are broken 
+            into the following 5 blocks:
+                1. 1xx Informational
+                2. 2xx Success
+                3. 3xx Redirection
+                4. 4xx Client Error
+                5. 5xx Server Error
+        2. HTTP response headers
+            Much like an HTTP request, an HTTP response comes with headers that convey important information such as the language and format of the data being
+            sent in the response body
+            Example of HTTP response headers from Google Chrome's network tab:
+                    Response Headers:
+                    ar-atime: 0.067
+                    ar-cache: BYPASS
+                    ar-poweredby: Arvan Cloud (arvancloud.com)
+                    ar-request-id: 34a2a10eb51edb77195470d8c056e7bd
+                    ar-sid: 2001
+                    content-encoding: gzip
+                    content-security-policy: upgrade-insecure-requests
+                    content-type: text/html;charset=UTF-8
+                    date: Sun, 28 Aug 2022 05:53:27 GMT
+                    server: ArvanCloud
+                    vary: Accept-Encoding
+                    vary: accept-encoding
+                    x-xss-protection: 1; mode=block            
+        3. optional HTTP body
+            Successful HTTP responses to ‘GET’ requests generally have a body which contains the requested information. In most web requests, this is HTML
+            data which a web browser will translate into a web page.
+--------------------------------------------------------------------------
+HTTP status codes:
+If-Modified-Since: ----  => 304 Not Modified-Since
+403 Forbidden
+401 Unauthorized
+200 OK
+206 Partial Content
+400 Bad Request
+500 Internal Server Error
+404 Not Found
+301 Moved Permanently
+405 Method Not Allowed
+--------------------------------------------------------------------------
