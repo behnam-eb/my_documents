@@ -1,30 +1,59 @@
 --------------------------------------------------------------------------
-If-Modified-Since: ----  => 304 Not Modified-Since
-403 Forbidden
-401 Unauthorized
-200 OK
-206 Partial Content
-400 Bad Request
-500 Internal Server Error
-404 Not Found
-301 Moved Permanently
-405 Method Not Allowed
+The Apache HTTP server is the most widely-used web server in the world. It provides many powerful features including dynamically
+loadable modules, robust media support, and extensive integration with other popular software.
+
+  /etc/httpd/
+              |-conf/
+              |-conf.d/
+              |-conf.modules.d/
+              |-logs -> link to /var/log/httpd/
+              |-modules -> link to /var/lib64/httpd/modules/
+              |-run -> link to /run/httpd
 --------------------------------------------------------------------------
-sudo apt install apache2
-apache2.conf
-httpd.conf
-/etc/apache2/conf-available or /etc/apache2/conf.d 
-conf-enabled: holds symlinks to the files in /etc/apache2/conf-available. 
-envvars: file where Apache2 environment variables are set.
-mods-available: this directory contains configuration files to both load modules and configure them. Not all modules will have specific configuration files, however.
-mods-enabled: holds symlinks to the files in /etc/apache2/mods-available. When a module configuration file is symlinked it will be enabled the next time apache2 is restarted.
-ports.conf: houses the directives that determine which TCP ports Apache2 is listening on.
-sites-available
-sites-enabled:  contains symlinks to the /etc/apache2/sites-available directory.
-magic: instructions for determining MIME type based on the first few bytes of a file.
+$ yum install httpd
+$ systemctl start httpd
+$ systemctl enable httpd
+$ firewall-cmd --permanent --add-service=http
+$ firewall-cmd --permanent --add-service=https
+$ firewall-cmd --reload
+--------------------------------------------------------------------------
+Setting Up Virtual Hosts (Recommended):
+$ mkdir -p /var/www/[your_domain]/html
+$ mkdir -p /var/www/[your_domain]/log
+$ chown -R $USER:$USER /var/www/your_domain/html
+$ chmod -R 755 /var/www
+$ vim /var/www/your_domain/html/index.html
+        <html>
+          <head>
+            <title>Welcome to your website!</title>
+          </head>
+          <body>
+            <h1>Success! The your_domain virtual host is working!</h1>
+          </body>
+        </html>      
+$ mkdir /etc/httpd/sites-available /etc/httpd/sites-enabled
+$ vim /etc/httpd/conf/httpd.conf
+        IncludeOptional sites-enabled/*.conf
+$ vim /etc/httpd/sites-available/[your_domain].conf        
+        <VirtualHost *:80>
+            ServerName www.your_domain
+            ServerAlias your_domain
+            DocumentRoot /var/www/your_domain/html
+            ErrorLog /var/www/your_domain/log/error.log
+            CustomLog /var/www/your_domain/log/requests.log combined
+        </VirtualHost>      
+$ ln -s /etc/httpd/sites-available/[your_domain].conf /etc/httpd/sites-enabled/[your_domain].conf  
+---------------------
+**SELinux is configured to work with the default Apache configuration. Since you set up a custom log directory in the virtual hosts
+configuration file, you will receive an error if you attempt to start the Apache service. To resolve this, you need to update the 
+SELinux policies to allow Apache to write to the necessary files. **
 
-/etc/apache2/mods-available/mime.conf, which might also include additions and overrides, and is /etc/mime.types by default.
-
-$ sudo a2ensite mynewsite
-$ sudo systemctl restart apache2.service
+$ setsebool -P httpd_unified 1   => httpd_unified is the boolean that will tell SELinux to treat all Apache processes 
+                                     as the same type, so you enabled it with a value of 1.
+$ ls -dZ /var/www/[your_domain]/log/
+$ semanage fcontext -a -t httpd_log_t "/var/www/your_domain/log(/.*)?"
+$ restorecon -R -v /var/www/your_domain/log
+$ ls -dZ /var/www/your_domain/log/
+---------------------
+$ systemctl restart httpd
 --------------------------------------------------------------------------
