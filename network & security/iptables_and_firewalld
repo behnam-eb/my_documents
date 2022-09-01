@@ -1,0 +1,37 @@
+--------------------------------------------------------------------------
+[system-config-firewall]                    [D-BUS]           [firewall-config]           [firewall-cmd]
+          |                                    |                       |                            |
+     [iptables(service)]                       |------------->[firewalld(daemon and service)]<------|     
+          |                                                                |
+          |---------------------------->[iptables(command)]<---------------|
+                                                |
+                                                |
+                                        [kernel(netfilterd)]
+--------------------------------------------------------------------------
+The iptables firewall uses tables to organize its rules. These tables classify rules according to the type of decisions they are used to make.
+For instance, if a rule deals with network address translation, it will be put into the nat table. If the rule is used to decide whether to 
+allow the packet to continue to its destination, it would probably be added to the filter table.
+
+There are five netfilter hooks that programs can register with. As packets progress through the stack, they will trigger the kernel modules that
+have registered with these hooks. The hooks that a packet will trigger depends on whether the packet is incoming or outgoing, the packet’s 
+destination, and whether the packet was dropped or rejected at a previous point.
+
+The following hooks represent various well-defined points in the networking stack:
+NF_IP_PRE_ROUTING ========> This hook will be triggered by any incoming traffic very soon after entering the network stack. This hook is processed before 
+                             any routing decisions have been made regarding where to send the packet.
+NF_IP_LOCAL_IN ===========> This hook is triggered after an incoming packet has been routed if the packet is destined for the local system.
+NF_IP_FORWARD ============> This hook is triggered after an incoming packet has been routed if the packet is to be forwarded to another host.
+NF_IP_LOCAL_OUT ==========> This hook is triggered by any locally created outbound traffic as soon it hits the network stack.
+NF_IP_POST_ROUTING =======> This hook is triggered by any outgoing or forwarded traffic after routing has taken place and just before being put out on the wire.
+
+
+Within each iptables table, rules are further organized within separate “chains”. While tables are defined by the general aim of the rules they
+hold, the built-in chains represent the netfilter hooks which trigger them. Chains basically determine when rules will be evaluated.
+As you can see, the names of the built-in chains mirror the names of the netfilter hooks they are associated with:
+
+PREROUTING ===========> Triggered by the NF_IP_PRE_ROUTING hook.
+INPUT ================> Triggered by the NF_IP_LOCAL_IN hook.
+FORWARD ==============> Triggered by the NF_IP_FORWARD hook.
+OUTPUT ===============> Triggered by the NF_IP_LOCAL_OUT hook.
+POSTROUTING ==========> Triggered by the NF_IP_POST_ROUTING hook.
+
