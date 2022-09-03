@@ -14,5 +14,18 @@ $ iptables -t [filter|nat|mangle] [-I|-A|-D|-U] [PREROUTING|INPUT|FORWARD|OUTPUT
                           state module — Enables state matching. --state [ESTABLISHED|INVALID|NEW|RELATED]
                           mac module — Enables hardware MAC address matching.
                           ....
---------------------------------------------------------------------------                          
-                          
+--------------------------------------------------------------------------        
+$ systemctl disable firewalld
+$ systemctl stop firewalld       
+$ yum install iptables-services.x86_64
+$ systemctl enable iptables.service
+$ systemctl start iptables.service
+
+$ less /etc/sysconfig/iptables   => iptables rules file
+--------------------------------------------------------------------------
+$ iptables -t mangle -nL  => if you don't specify table, it will show filter table by default
+-------------------
+After changing and testing :
+$ iptables-save > /etc/sysconfig/iptables
+$ systemctl restart iptables.service
+--------------------------------------------------------------------------
