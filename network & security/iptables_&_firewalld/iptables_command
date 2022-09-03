@@ -1,0 +1,18 @@
+--------------------------------------------------------------------------
+$ iptables -t [filter|nat|mangle] [-I|-A|-D|-U] [PREROUTING|INPUT|FORWARD|OUTPUT|POSTROUTING] [1 2 ... n] -p [tcp|udp|icmp] 
+           -s [192.168.1.40/32|192.168.40.0/24] -d [...] --sport [...] --dport [...] -m [module...] -J [ACCEPT|REJECT|DROP|DNAT|SNAT|MASQURADE|QUEUE] [extra.....]
+           
+           -I => insert
+           -A => append
+           -D => delete
+           -U => update
+           [1 2 .. n] => for append it doesn't mean because it will add rules at the end of table. for insert if you don't specify line number,it will insert at line 1
+           -m [module] => there are a lot of iptables modules you can use, for example :
+                          limit module — Places limits on how many packets are matched to a particular rule. This is especially beneficial when used in conjunction with 
+                                        the LOG target as it can prevent a flood of matching packets from filling up the system log with repetitive messages or using up
+                                        system resources.
+                          state module — Enables state matching. --state [ESTABLISHED|INVALID|NEW|RELATED]
+                          mac module — Enables hardware MAC address matching.
+                          ....
+--------------------------------------------------------------------------                          
+                          
