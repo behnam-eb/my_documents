@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------
 $ iptables -t [filter|nat|mangle] [-I|-A|-D|-U] [PREROUTING|INPUT|FORWARD|OUTPUT|POSTROUTING] [1 2 ... n] -p [tcp|udp|icmp] 
-           -s [192.168.1.40/32|192.168.40.0/24] -d [...] --sport [...] --dport [...] -m [module...] -J [ACCEPT|REJECT|DROP|DNAT|SNAT|MASQURADE|QUEUE] [extra.....]
+           -s [192.168.1.40/32|192.168.40.0/24] -d [...] --sport [...] --dport [...] -m [module...] -j [ACCEPT|REJECT|DROP|DNAT|SNAT|MASQURADE|QUEUE] [extra.....]
            
            -I => insert
            -A => append
