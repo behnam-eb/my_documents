@@ -34,4 +34,51 @@ INPUT ================> Triggered by the NF_IP_LOCAL_IN hook.
 FORWARD ==============> Triggered by the NF_IP_FORWARD hook.
 OUTPUT ===============> Triggered by the NF_IP_LOCAL_OUT hook.
 POSTROUTING ==========> Triggered by the NF_IP_POST_ROUTING hook.
+--------------------------------------------------------------------------
+**The Filter Table:
+The filter table is one of the most widely used tables in iptables. The filter table is used to make decisions about whether to let a packet continue to 
+its intended destination or to deny its request. In firewall parlance, this is known as “filtering” packets. This table provides the bulk of functionality 
+that people think of when discussing firewalls.
 
+**The NAT Table:
+The nat table is used to implement network address translation rules. As packets enter the network stack, rules in this table will determine whether and
+how to modify the packet’s source or destination addresses in order to impact the way that the packet and any response traffic are routed. This is often 
+used to route packets to networks when direct access is not possible.
+
+**The Mangle Table:
+The mangle table is used to alter the IP headers of the packet in various ways. For instance, you can adjust the TTL (Time to Live) value of a packet, either
+lengthening or shortening the number of valid network hops the packet can sustain. Other IP headers can be altered in similar ways.
+
+This table can also place an internal kernel “mark” on the packet for further processing in other tables and by other networking tools. This mark does not 
+touch the actual packet, but adds the mark to the kernel’s representation of the packet.
+--------------------------------------------------------------------------
+Assuming that the server knows how to route a packet and that the firewall rules permit its transmission, the following flows represent the paths that will
+be traversed in different situations:
+
+Incoming packets destined for the local system:    PREROUTING -> INPUT
+Incoming packets destined to another host:         PREROUTING -> FORWARD -> POSTROUTING
+Locally generated packets:                         OUTPUT -> POSTROUTING
+--------------------------------------------------------------------------
+Available States:
+Connections tracked by the connection tracking system will be in one of the following states:
+
+NEW:      When a packet arrives that is not associated with an existing connection, but is not invalid as a first packet, a new connection will be added to 
+          the system with this label. This happens for both connection-aware protocols like TCP and for connectionless protocols like UDP.
+          
+ESTABLISHED: A connection is changed from NEW to ESTABLISHED when it receives a valid response in the opposite direction. For TCP connections, this means
+              a SYN/ACK and for UDP and ICMP traffic, this means a response where source and destination of the original packet are switched.
+              
+RELATED:   Packets that are not part of an existing connection, but are associated with a connection already in the system are labeled RELATED. This could 
+           mean a helper connection, as is the case with FTP data transmission connections, or it could be ICMP responses to connection attempts by other protocols.
+           
+INVALID:   Packets can be marked INVALID if they are not associated with an existing connection and aren’t appropriate for opening a new connection, if 
+           they cannot be identified, or if they aren’t routable among other reasons.
+           
+UNTRACKED: Packets can be marked as UNTRACKED if they’ve been targeted in a raw table chain to bypass tracking.
+
+SNAT:      A virtual state set when the source address has been altered by NAT operations. This is used by the connection tracking system so that it knows
+           to change the source addresses back in reply packets.
+           
+DNAT:      A virtual state set when the destination address has been altered by NAT operations. This is used by the connection tracking system so that 
+           it knows to change the destination address back when routing reply packets.
+--------------------------------------------------------------------------
