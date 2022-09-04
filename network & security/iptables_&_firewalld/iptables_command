@@ -30,4 +30,8 @@ After changing and testing :
 $ iptables-save > /etc/sysconfig/iptables
 $ systemctl restart iptables.service
 --------------------------------------------------------------------------
-$ iptables -t filter -P FORWARD DROP   => policy is the default bahavier of a chain .
+$ iptables -t filter -P FORWARD DROP   => policy is the default bahavier of a chain . you can change it using -P
+                                          *** momkene policy input ra drop bazany va masalan badesh biay 22 ro accept koni, hala agar biay
+                                              iptables -F bezani, rule ha hazf mishan vali oon policy vojood dere va dastresi ssh ro az dast midi !
+
+--------------------------------------------------------------------------
