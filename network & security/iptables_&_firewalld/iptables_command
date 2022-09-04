@@ -24,8 +24,10 @@ $ systemctl start iptables.service
 $ less /etc/sysconfig/iptables   => iptables rules file
 --------------------------------------------------------------------------
 $ iptables -t mangle -nL  => if you don't specify table, it will show filter table by default
+$ iptables -F -t na   => if you don't specify table, it will flush filter table by default
 -------------------
 After changing and testing :
 $ iptables-save > /etc/sysconfig/iptables
 $ systemctl restart iptables.service
 --------------------------------------------------------------------------
+$ iptables -t filter -P FORWARD DROP   => policy is the default bahavier of a chain .
