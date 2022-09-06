@@ -42,3 +42,8 @@ $ iptables -t filter -I CHECK_INPUT -p tcp --dport 22 -s 192.168.122.1/32 -j ACC
 $ iptables -t filter -A INPUT -j DROP  => it's better we define drop sections in the main chains
 $ iptables-save > /etc/sysconfig/iptables
 --------------------------------------------------------------------------
+For return packets (responses) instead of setting many rules just define these two rules:
+
+$ iptables -t filter -I INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+$ iptables -t filter -I OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+--------------------------------------------------------------------------
