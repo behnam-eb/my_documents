@@ -5,26 +5,50 @@
 10.0.15.22      node02
 Root privileges
 --------------------------------------------------------------------------
-** on all nodes:
+-------------------- on all nodes ----------------------------------------
+--------------------------------------------------------------------------
 $ vim /etc/hosts
       10.0.15.10      k8s-master
       10.0.15.21      node01
       10.0.15.22      node02
+-----------------------      
 ### Disable selinux ( it's better not to do it! )
 $ setenforce 0
 $ sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-
+-----------------------
 ### The br_netfilter module is required for kubernetes installation. Enable this kernel module so that the packets traversing the
     bridge are processed by iptables for filtering and for port forwarding, and the kubernetes pods across the cluster can communicate with each other.
 $ modprobe br_netfilter
 $ echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables    
-
+-----------------------
 ### Disable SWAP for kubernetes installation by running the following commands.
 $ swapoff -a
 ### And then edit the '/etc/fstab' file. Comment the swap line UUID
 $ vim /etc/fstab
-
+-----------------------
 ### Install the latest version of Docker-ce from the docker repository.
 $ yum install -y yum-utils device-mapper-persistent-data lvm2
 $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 $ yum install -y docker-ce
+-----------------------
+### Install Kubernetes
+$ cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+              https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      EOF
+$ yum install -y kubelet kubeadm kubectl
+-----------------------
+$ sudo reboot
+-----------------------
+$ systemctl start docker && systemctl enable docker
+$ systemctl start kubelet && systemctl enable kubelet
+-----------------------
+### We need to make sure the docker-ce and kubernetes are using same 'cgroup'.
+$ docker info | grep -i cgroup
+$ sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
