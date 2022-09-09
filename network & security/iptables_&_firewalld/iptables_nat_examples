@@ -1,0 +1,10 @@
+--------------------------------------------------------------------------
+172.16.2.11:80  ==>  172.16.2.10:80
+* on 172.16.2.11:
+$ iptables -t nat -I PREROUTING -d 172.16.2.11 --dport 80 -j DNAT --to-destination 172.16.2.10:80
+$ iptables -t nat -I POSTROUTING -j MASQUERADE 
+$ sysctl -w net.ipv4.ip_forward=1   => it is temperory. for permanant, run below commands :
+$ vim /etc/sysctl.conf
+    net.ipv4.ip_forward = 1
+$ sysctl -p /etc/sysctl.conf 
+--------------------------------------------------------------------------
