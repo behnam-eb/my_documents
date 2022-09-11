@@ -1,0 +1,13 @@
+--------------------------------------------------------------------------
+$ docker -v
+$ docker network create -d bridge redisnet   => Create a dedicated Docker network
+$ docker run -d -p 6379:6379 --name myredis --network redisnet redis  => Run Redis container
+$ docker ps
+$ docker exec -it [container-id] sh
+    # redis-cli
+    127.0.0.1:6379> set a1 10
+    OK
+    127.0.0.1:6379> get a1
+    "10"
+    127.0.0.1:6379> ...
+--------------------------------------------------------------------------    
