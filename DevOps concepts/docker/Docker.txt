@@ -12,20 +12,6 @@ Uninstalling
 $ sudo yum remove docker-ce docker-ce-cli containerd.io
 $ sudo rm -rf /var/lib/docker
 --------------------------------------------------------------------------
----- Docker compose ------------------------------------------------------
-Compose is a tool for defining and running multi-container Docker applications.
-With Compose, you use a YAML file to configure your application’s services.
-Then, with a single command, you create and start all the services from your configuration.
-
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-$ sudo chmod +x /usr/local/bin/docker-compose
-$ docker-compose --version
-$ docker-compose up -d
-$ docker-compose ps
-$ docker-compose logs => logs of containers that are managed by compose
-$ docker-compose logs -f => to follow the logs
-$ docker-compose start/stop/up/down/rm 
-$ docker-compose build => rebuild images that we changed their Dockerfile
 ---- Essential commands --------------------------------------------------
 $ docker run --detach --name behnam busybox(name of image) => --detach -> for running in the background 
 $ docker start/stop/restart/kill/rm (name of container)
@@ -60,6 +46,20 @@ $ docker pull ubuntu:16.04
 $ docker tag ubuntu:16.04 localhost:5000/my-ubuntu => source to dest
 $ docker push localhost:5000/my-ubuntu
 --------------------------------------------------------------------------
+---- Docker compose ------------------------------------------------------
+Compose is a tool for defining and running multi-container Docker applications.
+With Compose, you use a YAML file to configure your application’s services.
+Then, with a single command, you create and start all the services from your configuration.
+
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+$ docker-compose --version
+$ docker-compose up -d
+$ docker-compose ps
+$ docker-compose logs => logs of containers that are managed by compose
+$ docker-compose logs -f => to follow the logs
+$ docker-compose start/stop/up/down/rm 
+$ docker-compose build => rebuild images that we changed their Dockerfile
 $ docker login -u behnam -p qazwsx => login to DockerHub
 $ docker push [container]:[tag]
 --------------------------------------------------------------------------
