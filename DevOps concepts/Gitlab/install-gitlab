@@ -1,0 +1,13 @@
+--------------------------------------------------------------------------
+$ sudo yum install -y curl policycoreutils-python openssh-server perl
+$ sudo firewall-cmd --permanent --add-service=http
+$ sudo firewall-cmd --permanent --add-service=https
+$ sudo systemctl reload firewalld
+--------------------------------------------------------------------------
+$ sudo yum install postfix
+$ sudo systemctl enable postfix
+$ sudo systemctl start postfix
+--------------------------------------------------------------------------
+$ curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+$ sudo EXTERNAL_URL="https://gitlab.behnam.com" yum install -y gitlab-ee
+--------------------------------------------------------------------------
