@@ -30,3 +30,61 @@ balance roundrobin line specifies the load balancing algorithm, which is detaile
 mode http specifies that layer 7 proxying will be used, which is explained in the Types of Load Balancing section.
 The check option at the end of the server directives specifies that health checks should be performed on those backend servers.
 --------------------------------------------------------------------------
+** Frontend
+A frontend defines how requests should be forwarded to backends. Frontends are defined in the frontend section of the HAProxy configuration. Their definitions are composed of the following components:
+
+a set of IP addresses and a port (e.g. 10.1.1.7:80, *:443, etc.)
+ACLs
+use_backend rules, which define which backends to use depending on which ACL conditions are matched, and/or a default_backend rule that handles every other case
+A frontend can be configured to various types of network traffic, as explained in the next section.
+--------------------------------------------------------------------------
+Types of Load Balancing :
+
+*** Layer 4 Load Balancing
+The simplest way to load balance network traffic to multiple servers is to use layer 4 (transport layer) load balancing. Load balancing this way will forward user traffic based on IP range and port (i.e. if a request comes in for http://yourdomain.com/anything, the traffic will be forwarded to the backend that handles all the requests for yourdomain.com on port 80).
+
+*** Layer 7 Load Balancing
+Another, more complex way to load balance network traffic is to use layer 7 (application layer) load balancing. Using layer 7 allows the load balancer to forward requests to different backend servers based on the content of the user’s request. This mode of load balancing allows you to run multiple web application servers under the same domain and port.
+
+example:
+      frontend http
+        bind *:80
+        mode http
+      
+        acl url_blog path_beg /blog
+        use_backend blog-backend if url_blog
+       
+        default_backend web-backend
+--------------------------------------------------------------------------
+Load Balancing Algorithms:
+The load balancing algorithm that is used determines which server, in a backend, will be selected when load balancing.
+
+*** roundrobin
+Round Robin selects servers in turns. This is the default algorithm.
+
+*** leastconn
+Selects the server with the least number of connections. This is recommended for longer sessions. Servers in the same backend are also rotated in a round-robin fashion.
+
+*** source
+This selects which server to use based on a hash of the source IP address that users are making requests from. This method ensures that the same users will connect to the same servers.
+--------------------------------------------------------------------------
+Sticky Sessions
+Some applications require that a user continues to connect to the same backend server. This can be achieved through sticky sessions, using the appsession parameter in the backend that requires it.
+--------------------------------------------------------------------------
+Health Check
+HAProxy uses health checks to determine if a backend server is available to process requests. This avoids having to manually remove a server from the backend if it becomes unavailable. The default health check is to try to establish a TCP connection to the server.
+
+If a server fails a health check, and therefore is unable to serve requests, it is automatically disabled in the backend, and traffic will not be forwarded to it until it becomes healthy again. If all servers in a backend fail, the service will become unavailable until at least one of those backend servers becomes healthy again.
+
+For certain types of backends, like database servers, the default health check is not necessarily to determine whether a server is still healthy.
+
+The Nginx web server can also be used as a standalone proxy server or load balancer, and is often used in conjunction with HAProxy for its caching and compression capabilities.
+--------------------------------------------------------------------------
+High Availability
+The layer 4 and 7 load balancing setups described in this tutorial both use a load balancer to direct traffic to one of many backend servers. However, your load balancer is a single point of failure in these setups; if it goes down or gets overwhelmed with requests, it can cause high latency or downtime for your service.
+
+A high availability (HA) setup is broadly defined as infrastructure without a single point of failure. It prevents a single server failure from being a downtime event by adding redundancy to every layer of your architecture. A load balancer facilitates redundancy for the backend layer (web/app servers), but for a true high availability setup, you need to have redundant load balancers as well.
+
+example:
+In this example, you have multiple load balancers (one active and one or more passive) behind a static IP address(floating ip) that can be remapped from one server to another. When a user accesses your website, the request goes through the external IP address to the active load balancer. If that load balancer fails, your failover mechanism will detect it and automatically reassign the IP address to one of the passive servers. There are a number of different ways to implement an active/passive HA setup. 
+--------------------------------------------------------------------------
