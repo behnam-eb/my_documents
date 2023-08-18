@@ -1,0 +1,2 @@
+# creating pool
+$ ceph osd pool create [pool-name] [pg-num]
