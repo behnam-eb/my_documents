@@ -1,0 +1,51 @@
+Glance    Cinder    Nova-API
+||||||||||||||||||||||||||||
+  CEPH Block Device (RBD)
+
+Swift-API    Keystone-API
+|||||||||||||||||||||||||
+CEPH Object Gateway (RGW)
+
+*****************************************************************************************
+https://docs.ceph.com/en/reef/rbd/rbd-openstack/
+*****************************************************************************************
+*** On CEPH Cluster:
+$ ceph osd pool create volumes
+$ ceph osd pool create images
+$ ceph osd pool create backups
+$ ceph osd pool create vms
+
+$ rbd pool init volumes
+$ rbd pool init images
+$ rbd pool init backups
+$ rbd pool init vms
+*****************************************************************************************
+*** For GLANCE :
+On Controller Nodes:
+[glence-node]$ sudo apt-get install python3-rbd    // $ sudo yum install python-rbd
+[ceph-admin]$ ssh root@[glence-ip] sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+[ceph-admin]$ ceph auth get-or-create client.glance | ssh {your-glance-api-server} sudo tee /etc/ceph/ceph.client.glance.keyring
+[ceph-admin]$ ssh {your-glance-api-server} sudo chown glance:glance /etc/ceph/ceph.client.glance.keyring
+*****************************************************************************************
+*** For Cinder-volume and Cinder-backup :
+[cinder-node]$ sudo apt-get install ceph-common    // $ sudo yum install ceph-common
+[ceph-admin]$ ssh root@[cinder-ip] sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+[ceph-admin]$ ceph auth get-or-create client.cinder | ssh {your-volume-server} sudo tee /etc/ceph/ceph.client.cinder.keyring
+[ceph-admin]$ ssh {your-cinder-volume-server} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
+[ceph-admin]$ ceph auth get-or-create client.cinder-backup | ssh {your-cinder-backup-server} sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
+[ceph-admin]$ ssh {your-cinder-backup-server} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+*****************************************************************************************
+*** For Nova-compute :
+[compute-node]$ sudo apt-get install ceph-common    // $ sudo yum install ceph-common
+[ceph-admin]$ ssh root@[compute-ip] sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
+[ceph-admin]$ ceph auth get-or-create client.cinder | ssh {your-nova-compute-server} sudo tee /etc/ceph/ceph.client.cinder.keyring
+
+They also need to store the secret key of the client.cinder user in libvirt. 
+The libvirt process needs it to access the cluster while attaching a block device from Cinder.
+[ceph-admin]$ ceph auth get-key client.cinder | ssh {your-compute-node} tee client.cinder.key
+[compute-node]$ uuidgen
+
+
+
+
+ 
