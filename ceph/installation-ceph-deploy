@@ -1,0 +1,105 @@
+[all-nodes]$ vim /etc/hosts
+192.168.1.116 ceph-admin
+192.168.1.117 ceph-mon
+192.168.1.118 ceph-osd1
+192.168.1.119 ceph-osd2
+192.168.1.120 ceph-osd3
+
+[all-nodes]$ apt install chrony -y
+
+[all-nodes]$ vim /etc/chrony/chrony.conf
+pool 0.asia.pool.ntp.org iburst maxsources 2
+pool 1.asia.pool.ntp.org iburst maxsources 2
+pool 2.asia.pool.ntp.org iburst maxsources 2
+pool 3.asia.pool.ntp.org iburst maxsources 2
+pool ir.pool.ntp.org iburst maxsources 2
+
+[all-nodes]$ useradd cephadm && echo "123456" | passwd --stdin cephadm
+
+[all-nodes]$ echo "cephadm ALL=(root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/cephadm
+
+[all-nodes]$ chmod 440 /etc/sudoers.d/cephadm
+
+[all-nodes]$ reboot
+
+[ceph-deploy]$ su - cephadm
+
+[ceph-deploy]$ ssh-keygen
+
+[ceph-deploy]$ ssh-copy-id [mon|osd1|osd2|osd3|client1|client2]
+
+[ceph-deploy]$ vim .ssh/config 
+Host mon
+   Hostname mon
+   User cephadm
+Host osd1
+   Hostname osd1
+   User cephadm
+...
+
+[ceph-deploy]$ chmod 644 ~/.ssh/config
+
+[ceph-deploy]$ su - cephadm
+
+[ceph-deploy]$ sudo rpm -Uvh https://download.ceph.com/rpm-mimic/el7/noarch/ceph-release-1-1-el7.noarch.rpm
+
+[ceph-deploy]$ sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+[ceph-deploy]$ sudo yum update -y && sudo yum install ceph-deploy python2-pip -y
+
+[ceph-deploy]$ mkdir ceph_cluster
+
+[ceph-deploy]$ cd ceph_cluster
+
+[ceph-deploy]$ ceph-deploy new mon
+
+[ceph-deploy]$ vim ceph.conf
+...
+public network = 192.168.1.0/24
+
+[ceph-deploy]$ ceph-deploy install deploy mon osd1 osd2 ... => installation of ceph package
+
+[ceph-deploy]$ ceph-deploy mon create-initial => it install mon and gather all keyrings in mon node
+                                                 ceph.client.admin.keyring
+                                                 ceph.bootstrap-mds.keyring
+                                                 ceph.bootstrap-mgr.keyring
+                                                 ceph.mon.keyring
+                                                 ceph.bootstrap-osd.keyring
+                                                 ceph.bootstrap-rgw.keyring
+
+[ceph-deploy]$ ceph-deploy admin deploy mon osd1 osd2 ... => it copies ceph.conf and ceph.client.admin.keyring on all nodes
+
+[all-nodes]$ chmod 644 /etc/ceph/ceph.client.admin.keyring
+
+[all-nodes]$ ceph osd ls => for checking
+
+[ceph-deploy]$ sudo - cephadm
+
+[ceph-deploy]$ cd ceph_cluster
+
+[ceph-deploy]$ ceph-deploy mgr create osd1 osd2 osd3 ... => it will create osd systemctl services on osd nodes
+
+[ceph-deploy]$ ceph-deploy disk list osd1 osd2 osd3 =>list od disks on osd nodes
+
+[ceph-deploy]$ ceph-deploy disk zap osd1 /dev/sdb => it will clean disk's data
+[ceph-deploy]$ ceph-deploy disk zap osd1 /dev/sdc 
+[ceph-deploy]$ ceph-deploy disk zap osd2 /dev/sdb 
+[ceph-deploy]$ ceph-deploy disk zap osd2 /dev/sdc 
+...
+
+[ceph-deploy]$ ceph-deploy osd create --data /dev/sdb osd1 => it will label disks as osd
+[ceph-deploy]$ ceph-deploy osd create --data /dev/sdc osd1
+[ceph-deploy]$ ceph-deploy osd create --data /dev/sdb osd2
+[ceph-deploy]$ ceph-deploy osd create --data /dev/sdc osd2
+...
+
+[one-of-nodes]$ ceph -s
+[one-of-nodes]$ ceph health
+
+[all-nodes]$ systemctl restart ceph.target  => for restarting all ceph services on a node
+[all-nodes]$ systemctl --type service | grep ceph => to find specific service and after that restarting that service
+
+
+
+
+
