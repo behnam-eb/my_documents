@@ -26,6 +26,19 @@ On Controller Nodes:
 [ceph-admin]$ ssh root@[glence-ip] sudo tee /etc/ceph/ceph.conf </etc/ceph/ceph.conf
 [ceph-admin]$ ceph auth get-or-create client.glance | ssh {your-glance-api-server} sudo tee /etc/ceph/ceph.client.glance.keyring
 [ceph-admin]$ ssh {your-glance-api-server} sudo chown glance:glance /etc/ceph/ceph.client.glance.keyring
+
+[glence-node]$ vim /etc/glance/glance-api.conf
+...
+[glance_store]
+stores = rbd
+default_store = rbd
+rbd_store_pool = images
+rbd_store_user = glance
+rbd_store_ceph_conf = /etc/ceph/ceph.conf
+rbd_store_chunk_size = 8
+...
+
+[glence-node]$ systemctl restart glance-api.service
 *****************************************************************************************
 *** For Cinder-volume and Cinder-backup :
 [cinder-node]$ sudo apt-get install ceph-common    // $ sudo yum install ceph-common
@@ -34,6 +47,36 @@ On Controller Nodes:
 [ceph-admin]$ ssh {your-cinder-volume-server} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
 [ceph-admin]$ ceph auth get-or-create client.cinder-backup | ssh {your-cinder-backup-server} sudo tee /etc/ceph/ceph.client.cinder-backup.keyring
 [ceph-admin]$ ssh {your-cinder-backup-server} sudo chown cinder:cinder /etc/ceph/ceph.client.cinder-backup.keyring
+
+[cinder-node]$ vim /etc/cinder/cinder.conf
+[DEFAULT]
+...
+enabled_backends = ceph
+glance_api_version = 2
+...
+[ceph]
+volume_driver = cinder.volume.drivers.rbd.RBDDriver
+volume_backend_name = ceph
+rbd_pool = volumes
+rbd_ceph_conf = /etc/ceph/ceph.conf
+rbd_flatten_volume_from_snapshot = false
+rbd_max_clone_depth = 5
+rbd_store_chunk_size = 4
+rados_connect_timeout = -1
+
+[cinder-node]$ systemctl restart cinder-*
+
+for cinder backup:
+[cinder-node]$ vim /etc/cinder/cinder.conf
+backup_driver = cinder.backup.drivers.ceph
+backup_ceph_conf = /etc/ceph/ceph.conf
+backup_ceph_user = cinder-backup
+backup_ceph_chunk_size = 134217728
+backup_ceph_pool = backups
+backup_ceph_stripe_unit = 0
+backup_ceph_stripe_count = 0
+restore_discard_excess_bytes = true
+
 *****************************************************************************************
 *** For Nova-compute :
 [compute-node]$ sudo apt-get install ceph-common    // $ sudo yum install ceph-common
@@ -43,9 +86,38 @@ On Controller Nodes:
 They also need to store the secret key of the client.cinder user in libvirt. 
 The libvirt process needs it to access the cluster while attaching a block device from Cinder.
 [ceph-admin]$ ceph auth get-key client.cinder | ssh {your-compute-node} tee client.cinder.key
-[compute-node]$ uuidgen
+[one-of-compute-nodes]$ uuidgen
 
+[compute-node]$ vim secret.xml
+<secret ephemeral='no' private='no'>
+  <uuid>[uuid-from-above-command]</uuid>
+  <usage type='ceph'>
+    <name>client.cinder secret</name>
+  </usage>
+</secret>
 
+[compute-node]$ sudo virsh secret-define --file secret.xml
 
+[compute-node]$ sudo virsh secret-set-value --secret [uuid-from-above-command] --base64 $(cat client.cinder.key) && rm client.cinder.key secret.xml
+
+[compute-node]$ virsh secret-list
+
+[compute-node]$ vim /etc/nova/nova.conf
+...
+[libvirt]
+images_type = rbd
+images_rbd_pool = vms
+images_rbd_ceph_conf = /etc/ceph/ceph.conf
+rbd_user = cinder
+rbd_secret_uuid = [uuid-from-above-command]
+disk_cachemodes="network=writeback"
+inject_password = false
+inject_key = false
+inject_partition = -2
+live_migration_flag="VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_PERSIST_DEST,VIR_MIGRATE_TUNNELLED"
+hw_disk_discard = unmap
+...
+
+[compute-node]$ systemctl restart nova-compute.service libvirtd.service
 
  
