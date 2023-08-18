@@ -1,0 +1,97 @@
+https://kifarunix.com/install-and-setup-ceph-storage-cluster-on-ubuntu/
+
+[all-nodes]$ vim /etc/hosts
+192.168.1.116 ceph-admin
+192.168.1.117 ceph-mon
+192.168.1.118 ceph-osd1
+192.168.1.119 ceph-osd2
+192.168.1.120 ceph-osd3
+
+[all-nodes]$ apt install chrony -y
+
+[all-nodes]$ vim /etc/chrony/chrony.conf
+pool 0.asia.pool.ntp.org iburst maxsources 2
+pool 1.asia.pool.ntp.org iburst maxsources 2
+pool 2.asia.pool.ntp.org iburst maxsources 2
+pool 3.asia.pool.ntp.org iburst maxsources 2
+pool ir.pool.ntp.org iburst maxsources 2
+
+[all-nodes]$ systemctl restart chronyd
+
+[all-nodes]$ sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
+
+[all-nodes]$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+[all-nodes]$ echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -sc) stable" | sudo tee /etc/apt/sources.list.d/docker-ce.list
+
+[all-nodes]$ sudo apt update
+
+[all-nodes]$ sudo apt install docker-ce docker-ce-cli containerd.io -y
+
+[all-nodes]$ sudo systemctl enable --now docker
+
+[all-nodes]$ vim /etc/ssh/sshd_config
+Match Address [ceph-admin IP]
+        PermitRootLogin yes
+		
+[all-nodes]$ systemctl reload sshd
+
+[ceph-admin]$ useradd -m -s /bin/bash cephadmin
+
+[ceph-admin]$ passwd cephadmin
+
+[ceph-admin]$ echo "cephadmin ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/cephadmin
+
+[ceph-admin]$ chmod 0440 /etc/sudoers.d/cephadmin
+
+[ceph-admin]$ apt install -y cephadm
+
+[ceph-admin]$ su - cephadmin
+
+[ceph-admin]$ cephadm bootstrap --mon-ip *<admin-ip>*
+
+[ceph-admin]$ docker ps
+
+[ceph-admin]$ sudo /usr/sbin/cephadm shell --fsid [...] -c /etc/ceph/ceph.conf -k /etc/ceph/ceph.client.admin.keyring
+
+[ceph-admin]$ ceph orch host label add ceph-admin _admin
+
+[ceph-admin]$ ^D ==> go to root
+
+[ceph-admin]$ sudo cephadm add-repo --release pacific
+
+[ceph-admin]$ sudo cephadm install ceph-common
+
+[ceph-admin]$ sudo ceph -s
+
+[ceph-admin]$ sudo ceph orch host ls
+
+[ceph-admin]$ sudo ssh-copy-id -f -i /etc/ceph/ceph.pub root@ceph-mon
+
+[ceph-admin]$ sudo ceph orch host add ceph-mon
+
+[ceph-admin]$ sudo ceph orch host label add ceph-mon mon
+
+[ceph-admin]$ for i in ceph-osd1 ceph-osd2 ceph-osd3; do sudo ssh-copy-id -f -i /etc/ceph/ceph.pub root@$i; done
+
+[ceph-admin]$ sudo ceph orch host add ceph-osd1
+
+[ceph-admin]$ sudo ceph orch host add ceph-osd2
+
+[ceph-admin]$ sudo ceph orch host add ceph-osd3
+
+[ceph-admin]$ for i in ceph-osd1 ceph-osd2 ceph-osd3; do sudo ceph orch host label add $i osd; done
+
+[ceph-admin]$ sudo ceph orch host ls
+
+[ceph-admin]$ ceph orch device ls
+
+[ceph-admin]$ ceph orch daemon add osd ceph-osd1:/dev/sdb
+[ceph-admin]$ ceph orch daemon add osd ceph-osd1:/dev/sdc
+[ceph-admin]$ ceph orch daemon add osd ceph-osd2:/dev/sdb
+...
+or => [ceph-admin]$ ceph orch apply osd --all-available-devices
+
+
+
+
