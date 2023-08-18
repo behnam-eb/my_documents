@@ -1,0 +1,20 @@
+$ ceph -s
+$ ceph -w
+
+$ ceph df
+$ ceph osd stat
+$ ceph osd dump
+$ ceph osd tree  => disks on each node are in /var/lib/ceph/osd/
+
+$ ceph mon stat
+$ ceph mon dump
+
+$ ceph mds stat
+
+$ ceph pg dump  == $ ceph pg dump all
+$ ceph pg dump pgs
+$ ceph pg dump osds
+$ ceph pg dump pools
+$ ceph pg stat
+$ ceph pg dump -o /opt/pg --format=json => $ cat /opt/pg
+
